@@ -1377,7 +1377,7 @@ if [ $SEND = "YES" ]; then
        RDATE=$($NDATE +$rst_int $CDATE)
        rPDY=$(echo $RDATE | cut -c1-8)
        rcyc=$(echo $RDATE | cut -c9-10)
-       for file in $(ls *0000.*) ; do
+       for file in $(ls) ; do
          $NCP $file $memdir/RESTART/$file
        done
      fi
