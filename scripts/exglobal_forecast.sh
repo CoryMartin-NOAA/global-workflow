@@ -1377,9 +1377,26 @@ if [ $SEND = "YES" ]; then
        RDATE=$($NDATE +$rst_int $CDATE)
        rPDY=$(echo $RDATE | cut -c1-8)
        rcyc=$(echo $RDATE | cut -c9-10)
-       for file in $(ls) ; do
+       for file in $(ls ${rPDY}.${rcyc}0000.*) ; do
          $NCP $file $memdir/RESTART/$file
        done
+       if [ $rst_int -eq $FHMAX ]; then
+       # need to rename some files and then copy
+         $NCP coupler.res $memdir/RESTART/${rPDY}.${rcyc}0000.coupler.res
+         $NCP fv_core.res.nc $memdir/RESTART/${rPDY}.${rcyc}0000.fv_core.res.nc
+         for file in $(ls fv_core.res.tile*) ; do
+           $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
+         done
+         for file in $(ls fv_tracer.res.tile*) ; do
+           $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
+         done
+         for file in $(ls phy_data.tile*) ; do
+           $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
+         done
+         for file in $(ls sfc_data.tile*) ; do
+           $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
+         done
+       fi
      fi
     done
     if [ $DOIAU = "YES" ] || [ $DOIAU_coldstart = "YES" ]; then
