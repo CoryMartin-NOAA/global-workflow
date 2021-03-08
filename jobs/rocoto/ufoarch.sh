@@ -1,6 +1,8 @@
 #!/bin/bash
 # quick script to copy/move/link files around from the ROTDIR to the ARCHDIR
 
+set -x
+
 NDATE=${NDATE:-/apps/contrib/NCEPLIBS/orion/utils/prod_util.v1.2.0/exec/ndate}
 
 # get time of future cycle for UFO/GSI
