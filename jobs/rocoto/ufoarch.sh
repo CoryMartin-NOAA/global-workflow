@@ -18,7 +18,7 @@ mv -f $ROTDIR/$CDUMP.$PDY/$cyc/* $ARCHDIR/$FDATE/$CDUMP.$PDY/$cyc/.
 
 # link bias corr files
 mkdir -p $ARCHDIR/$FDATE/$CDUMP.$fPDY/$fcyc/atmos
-ln -sf $ICSDIR/$FDATE/$CDUMP.$fPDY/$fcyc/*abias* $ARCHDIR/$FDATE/$CDUMP.$fPDY/$fcyc/atmos/.
+ln -sf $ICSDIR/$FDATE/$CDUMP.$PDY/$cyc/*abias* $ARCHDIR/$FDATE/$CDUMP.$PDY/$cyc/atmos/.
 
 # move the ROT to start fresh; can delete later if requested...
 mkdir -p $ROTDIR/$CDATE
