@@ -1396,6 +1396,9 @@ if [ $SEND = "YES" ]; then
          for file in $(ls sfc_data.tile*) ; do
            $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
          done
+         for file in $(ls fv_srf_wnd.res.tile*) ; do
+           $NCP $file $memdir/RESTART/${rPDY}.${rcyc}0000.$file
+         done
        fi
      fi
     done
