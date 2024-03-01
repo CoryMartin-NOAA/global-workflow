@@ -514,7 +514,7 @@ class GFSTasks(Tasks):
         deps.append(rocoto.add_dependency(dep_dict))
         dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
 
-        resources = self.get_resource('aeroanlpostl')
+        resources = self.get_resource('aeroanlpost')
         task_name = f'{self.cdump}aeroanlpost'
         task_dict = {'task_name': task_name,
                      'resources': resources,

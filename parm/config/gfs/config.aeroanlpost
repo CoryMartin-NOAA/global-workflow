@@ -1,0 +1,11 @@
+#!/bin/bash -x
+
+########## config.aeroanlpost ##########
+# Aerosol Analysis specific
+
+echo "BEGIN: config.aeroanlpost"
+
+# Get task specific resources
+. $EXPDIR/config.resources aeroanlpost
+
+echo "END: config.aeroanlpost"
