@@ -13,7 +13,7 @@ if (( $# != 1 )); then
     echo "atmanlinit atmanlrun atmanlfinal"
     echo "atmensanlinit atmensanlrun atmensanlfinal"
     echo "snowanl"
-    echo "aeroanlinit aeroanlrun aeroanlfinal"
+    echo "aeroanlinit aeroanlrun aeroanlpost aeroanlfinal"
     echo "anal sfcanl analcalc analdiag fcst echgres"
     echo "upp atmos_products"
     echo "tracker genesis genesis_fsu"
@@ -328,6 +328,14 @@ case ${step} in
     export nth_aeroanlrun_gfs=1
     export npe_node_aeroanlrun=$(( npe_node_max / nth_aeroanlrun ))
     export is_exclusive=True
+    ;;
+
+  "aeroanlpost")
+    export wtime_aeroanlpost="00:30:00"
+    export npe_aeroanlpost=1
+    export nth_aeroanlpost=20
+    export npe_node_aeroanlpost=$(( npe_node_max / nth_aeroanlpost ))
+    export memory_aeroanlpost="50G"
     ;;
 
   "aeroanlfinal")

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# exglobal_aero_analysis_finalize.py
+# exglobal_aero_analysis_post.py
 # This script creates an AerosolAnalysis class
-# and runs the finalize method
-# which performs clean up activities
+# and runs the postProcessing method
+# which perform post-processing activities
 # for a global aerosol variational analysis
 import os
 
@@ -21,4 +21,4 @@ if __name__ == '__main__':
 
     # Instantiate the aerosol analysis task
     AeroAnl = AerosolAnalysis(config)
-    AeroAnl.finalize()
+    #AeroAnl.postProcess()

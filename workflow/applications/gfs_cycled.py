@@ -103,7 +103,7 @@ class GFSCycledAppConfig(AppConfig):
                 configs += ['waveawipsbulls', 'waveawipsgridded']
 
         if self.do_aero:
-            configs += ['aeroanlinit', 'aeroanlrun', 'aeroanlfinal']
+            configs += ['aeroanlinit', 'aeroanlrun', 'aeroanlpost', 'aeroanlfinal']
 
         if self.do_jedisnowda:
             configs += ['prepsnowobs', 'snowanl']
@@ -146,7 +146,8 @@ class GFSCycledAppConfig(AppConfig):
         gdas_gfs_common_tasks_before_fcst += ['sfcanl', 'analcalc']
 
         if self.do_aero:
-            gdas_gfs_common_tasks_before_fcst += ['aeroanlinit', 'aeroanlrun', 'aeroanlfinal']
+            gdas_gfs_common_tasks_before_fcst += ['aeroanlinit', 'aeroanlrun',
+                                                  'aeroanlpost', 'aeroanlfinal']
 
         if self.do_jedisnowda:
             gdas_gfs_common_tasks_before_fcst += ['prepsnowobs', 'snowanl']
