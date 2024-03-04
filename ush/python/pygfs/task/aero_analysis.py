@@ -127,6 +127,20 @@ class AerosolAnalysis(Analysis):
         pass
 
     @logit(logger)
+    def postProcess(self: Analysis) -> None:
+        """Post process a global aerosol analysis
+
+        This method will post process a global aerosol analysis using JEDI.
+        This includes:
+        - applying the increments to the original RESTART files
+        - if applicable, regridding the analysis to the ensemble resolution
+
+        """
+        # ---- add increments to RESTART files
+        logger.info('Adding increments to RESTART files')
+        self._add_fms_cube_sphere_increments()
+
+    @logit(logger)
     def finalize(self: Analysis) -> None:
         """Finalize a global aerosol analysis
 
@@ -135,7 +149,6 @@ class AerosolAnalysis(Analysis):
         - tarring up output diag files and place in ROTDIR
         - copying the generated YAML file from initialize to the ROTDIR
         - copying the guess files to the ROTDIR
-        - applying the increments to the original RESTART files
         - moving the increment files to the ROTDIR
 
         """
@@ -179,10 +192,6 @@ class AerosolAnalysis(Analysis):
             dest = os.path.join(self.task_config.COM_CHEM_ANALYSIS, f'aeroges.{tracer}')
             bkglist.append([src, dest])
         FileHandler({'copy': bkglist}).sync()
-
-        # ---- add increments to RESTART files
-        logger.info('Adding increments to RESTART files')
-        self._add_fms_cube_sphere_increments()
 
         # ---- move increments to ROTDIR
         logger.info('Moving increments to ROTDIR')
