@@ -258,7 +258,7 @@ ${LINK_OR_COPY} "${HOMEgfs}/sorc/ufs_model.fd/tests/ufs_model.x" .
 [[ -s "upp.x" ]] && rm -f upp.x
 ${LINK_OR_COPY} "${HOMEgfs}/sorc/upp.fd/exec/upp.x" .
 
-for ufs_utilsexe in emcsfc_ice_blend emcsfc_snow2mdl global_cycle; do
+for ufs_utilsexe in emcsfc_ice_blend emcsfc_snow2mdl fregrid global_cycle; do
     [[ -s "${ufs_utilsexe}" ]] && rm -f "${ufs_utilsexe}"
     ${LINK_OR_COPY} "${HOMEgfs}/sorc/ufs_utils.fd/exec/${ufs_utilsexe}" .
 done
@@ -388,7 +388,7 @@ if [[ -d gsi_monitor.fd ]] ; then
   ${LINK} gsi_monitor.fd/src/Radiance_Monitor/nwprod/radmon_shared/sorc/verf_radtime.fd radmon_time.fd
 fi
 
-for prog in global_cycle.fd emcsfc_ice_blend.fd emcsfc_snow2mdl.fd ;do
+for prog in global_cycle.fd emcsfc_ice_blend.fd emcsfc_snow2mdl.fd fre-nctools.fd ;do
     [[ -d "${prog}" ]] && rm -rf "${prog}"
     ${LINK} "ufs_utils.fd/sorc/${prog}" "${prog}"
 done
