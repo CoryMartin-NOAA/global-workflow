@@ -1691,7 +1691,7 @@ class GFSTasks(Tasks):
 
     def obsmon(self):
         deps = []
-        if self.app_config.do_jediatmvar
+        if self.app_config.do_jediatmvar:
             dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlfinal'}
             deps.append(rocoto.add_dependency(dep_dict))
         if self.app_config.do_jediocnvar:
