@@ -1691,15 +1691,16 @@ class GFSTasks(Tasks):
 
     def obsmon(self):
         deps = []
-        dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlfinal'}
-        deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_jediocnvar:
+        if self.app_config.do_jediatmvar
+            dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlfinal'}
+            deps.append(rocoto.add_dependency(dep_dict))
+        if self.app_config.do_jediocnvar:
             dep_dict = {'type': 'task', 'name': f'{self.cdump}ocnanalpost'}
             deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_jedisnowda:
+        if self.app_config.do_jedisnowda:
             dep_dict = {'type': 'task', 'name': f'{self.cdump}snowanl'}
             deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_aero:
+        if self.app_config.do_aero:
             dep_dict = {'type': 'task', 'name': f'{self.cdump}aeroanlfinal'}
             deps.append(rocoto.add_dependency(dep_dict))
 

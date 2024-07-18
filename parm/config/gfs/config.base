@@ -479,6 +479,9 @@ else
    export DO_VERFRAD="YES"    # Radiance data assimilation monitoring
    export DO_VMINMON="YES"    # GSI minimization monitoring
    export DO_OBSMON="NO"     # IODA-based observation monitoring
+   if [[ ${DO_AERO} = "YES" || ${DO_JEDIOCNVAR} = "YES" || ${DO_JEDISNOWDA} = "YES " ]]; then
+     export DO_OBSMON="YES"
+   fi
 fi
 
 # If starting ICs that are not at cycle hour
