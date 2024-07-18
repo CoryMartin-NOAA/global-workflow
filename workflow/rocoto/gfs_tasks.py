@@ -1693,7 +1693,17 @@ class GFSTasks(Tasks):
         deps = []
         dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlfinal'}
         deps.append(rocoto.add_dependency(dep_dict))
-        dependencies = rocoto.create_dependency(dep=deps)
+        if self.do_jediocnvar:
+            dep_dict = {'type': 'task', 'name': f'{self.cdump}ocnanalpost'}
+            deps.append(rocoto.add_dependency(dep_dict))
+        if self.do_jedisnowda:
+            dep_dict = {'type': 'task', 'name': f'{self.cdump}snowanl'}
+            deps.append(rocoto.add_dependency(dep_dict))
+        if self.do_aero:
+            dep_dict = {'type': 'task', 'name': f'{self.cdump}aeroanlfinal'}
+            deps.append(rocoto.add_dependency(dep_dict))
+
+        dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
 
         resources = self.get_resource('obsmon')
         task_name = f'{self.cdump}obsmon'
