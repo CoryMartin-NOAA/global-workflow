@@ -58,6 +58,7 @@ class AppConfig(ABC, metaclass=AppConfigInit):
         self.do_verfozn = _base.get('DO_VERFOZN', True)
         self.do_verfrad = _base.get('DO_VERFRAD', True)
         self.do_vminmon = _base.get('DO_VMINMON', True)
+        self.do_obsmon = _base.get('DO_OBSMON', True)
         self.do_tracker = _base.get('DO_TRACKER', True)
         self.do_genesis = _base.get('DO_GENESIS', True)
         self.do_genesis_fsu = _base.get('DO_GENESIS_FSU', False)

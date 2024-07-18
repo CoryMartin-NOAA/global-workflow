@@ -1689,6 +1689,29 @@ class GFSTasks(Tasks):
 
         return task
 
+    def obsmon(self):
+        deps = []
+        dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlfinal'}
+        deps.append(rocoto.add_dependency(dep_dict))
+        dependencies = rocoto.create_dependency(dep=deps)
+
+        resources = self.get_resource('obsmon')
+        task_name = f'{self.cdump}obsmon'
+        task_dict = {'task_name': task_name,
+                     'resources': resources,
+                     'dependency': dependencies,
+                     'envars': self.envars,
+                     'cycledef': self.cdump.replace('enkf', ''),
+                     'command': f'{self.HOMEgfs}/jobs/rocoto/obsmon.sh',
+                     'job_name': f'{self.pslot}_{task_name}_@H',
+                     'log': f'{self.rotdir}/logs/@Y@m@d@H/{task_name}.log',
+                     'maxtries': '&MAXTRIES;'
+                     }
+
+        task = rocoto.create_task(task_dict)
+
+        return task
+
     def tracker(self):
         deps = []
         dep_dict = {'type': 'metatask', 'name': f'{self.cdump}atmos_prod'}
@@ -2181,6 +2204,9 @@ class GFSTasks(Tasks):
                 if self.app_config.do_vminmon:
                     dep_dict = {'type': 'task', 'name': f'{self.cdump}vminmon'}
                     deps.append(rocoto.add_dependency(dep_dict))
+                if self.app_config.do_obsmon:
+                    dep_dict = {'type': 'task', 'name': f'{self.cdump}obsmon'}
+                    deps.append(rocoto.add_dependency(dep_dict))
             elif self.cdump in ['gdas']:
                 dep_dict = {'type': 'task', 'name': f'{self.cdump}atmanlprod'}
                 deps.append(rocoto.add_dependency(dep_dict))
@@ -2195,6 +2221,9 @@ class GFSTasks(Tasks):
                     deps.append(rocoto.add_dependency(dep_dict))
                 if self.app_config.do_vminmon:
                     dep_dict = {'type': 'task', 'name': f'{self.cdump}vminmon'}
+                    deps.append(rocoto.add_dependency(dep_dict))
+                if self.app_config.do_obsmon:
+                    dep_dict = {'type': 'task', 'name': f'{self.cdump}obsmon'}
                     deps.append(rocoto.add_dependency(dep_dict))
         if self.cdump in ['gfs'] and self.app_config.do_tracker:
             dep_dict = {'type': 'task', 'name': f'{self.cdump}tracker'}
