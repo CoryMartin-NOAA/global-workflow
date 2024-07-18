@@ -208,7 +208,7 @@ class GFSCycledAppConfig(AppConfig):
 
         if self.do_vminmon:
             gdas_tasks += ['vminmon']
-        
+
         if self.do_obsmon:
             gdas_tasks += ['obsmon']
 
