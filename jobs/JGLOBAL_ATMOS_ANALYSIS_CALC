@@ -36,6 +36,8 @@ RUN=${GDUMP} YMD=${gPDY} HH=${gcyc} declare_from_tmpl -rx \
     COM_OBS_PREV:COM_OBS_TMPL \
     COM_ATMOS_HISTORY_PREV:COM_ATMOS_HISTORY_TMPL
 
+YMD=${PDY} HH=${cyc} declare_from_tmpl -rx \
+    COMIN_CHEM_ANALYSIS:COM_CHEM_ANALYSIS_TMPL
 
 export ATMGES="${COM_ATMOS_HISTORY_PREV}/${GPREFIX}atmf006.nc"
 if [ ! -f ${ATMGES} ]; then

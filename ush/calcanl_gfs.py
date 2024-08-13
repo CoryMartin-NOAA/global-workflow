@@ -20,7 +20,7 @@ python2fortran_bool = {True: '.true.', False: '.false.'}
 def calcanl_gfs(DoIAU, l4DEnsVar, Write4Danl, ComOut, APrefix,
                 ComIn_Ges, GPrefix,
                 FixDir, atmges_ens_mean, RunDir, NThreads, NEMSGet, IAUHrs,
-                ExecCMD, ExecCMDMPI, ExecAnl, ExecChgresInc, run, JEDI):
+                ExecCMD, ExecCMDMPI, ExecAnl, ExecChgresInc, run, JEDI, do_aero):
     print('calcanl_gfs beginning at: ', datetime.datetime.utcnow())
 
     IAUHH = IAUHrs
@@ -35,6 +35,8 @@ def calcanl_gfs(DoIAU, l4DEnsVar, Write4Danl, ComOut, APrefix,
                     gsi_utils.make_dir(CalcAnlDir)
                 gsi_utils.copy_file(ExecAnl, CalcAnlDir + '/calc_anl.x')
                 gsi_utils.link_file(RunDir + '/siginc.nc', CalcAnlDir + '/siginc.nc.06')
+                if do_aero:
+                    gsi_utils.link_file(RunDir + '/aeroinc.nc', CalcAnlDir + '/inc.aero.06')
                 gsi_utils.link_file(RunDir + '/sigf06', CalcAnlDir + '/ges.06')
                 gsi_utils.link_file(RunDir + '/siganl', CalcAnlDir + '/anl.06')
                 gsi_utils.copy_file(ExecChgresInc, CalcAnlDir + '/chgres_inc.x')
@@ -65,6 +67,9 @@ def calcanl_gfs(DoIAU, l4DEnsVar, Write4Danl, ComOut, APrefix,
                                         CalcAnlDir + '/siginc.nc.' + format(fh, '02'))
                     gsi_utils.link_file(CalcAnlDir6 + '/inc.fullres.' + format(fh, '02'),
                                         CalcAnlDir + '/inc.fullres.' + format(fh, '02'))
+                    if do_aero:
+                        gsi_utils.link_file(RunDir + '/aeroinc.nc',
+                                            CalcAnlDir + '/inc.aero.' + format(fh, '02'))
                     gsi_utils.link_file(RunDir + '/sigf' + format(fh, '02'),
                                         CalcAnlDir6 + '/ges.' + format(fh, '02'))
                     gsi_utils.link_file(RunDir + '/sigf' + format(fh, '02'),
@@ -277,6 +282,8 @@ def calcanl_gfs(DoIAU, l4DEnsVar, Write4Danl, ComOut, APrefix,
                          "increment_filename": "'inc.fullres'",
                          "fhr": 6,
                          "jedi": python2fortran_bool[JEDI],
+                         "aero_inc_filename": "'inc.aero'",
+                         "do_aero": python2fortran_bool[do_aero],
                          }
 
     gsi_utils.write_nml(namelist, CalcAnlDir6 + '/calc_analysis.nml')
@@ -362,10 +369,11 @@ if __name__ == '__main__':
     IAUHrs = cast_as_dtype(os.getenv('IAUFHRS', '6,'))
     Run = os.getenv('RUN', 'gdas')
     JEDI = gsi_utils.isTrue(os.getenv('DO_JEDIATMVAR', 'YES'))
+    do_aero = gsi_utils.isTrue(os.getenv('DO_AERO', 'YES'))
 
     print(locals())
     calcanl_gfs(DoIAU, l4DEnsVar, Write4Danl, ComOut, APrefix,
                 ComIn_Ges, GPrefix,
                 FixDir, atmges_ens_mean, RunDir, NThreads, NEMSGet, IAUHrs,
                 ExecCMD, ExecCMDMPI, ExecAnl, ExecChgresInc,
-                Run, JEDI)
+                Run, JEDI, do_aero)

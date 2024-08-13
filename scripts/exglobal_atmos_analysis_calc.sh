@@ -86,6 +86,9 @@ ATMANL=${ATMANL:-${COM_ATMOS_ANALYSIS}/${APREFIX}atmanl.nc}
 # Increment files
 ATMINC=${ATMINC:-${COM_ATMOS_ANALYSIS}/${APREFIX}atminc.nc}
 
+# Aerosol increment file
+AEROINC=${AEROINC:-${COMIN_CHEM_ANALYSIS}/${APREFIX}aeroinc.nc}
+
 # Set script / GSI control parameters
 DOHYBVAR=${DOHYBVAR:-"NO"}
 lrun_subdirs=${lrun_subdirs:-".true."}
@@ -136,6 +139,11 @@ if [ $DO_CALC_ANALYSIS == "YES" ]; then
    # link analysis and increment files
    $NLN $ATMANL siganl
    $NLN $ATMINC siginc.nc
+
+   if [ ${DO_AERO} == "YES" ]; then
+      $NLN $AEROINC aeroinc.nc
+   fi
+
    if [ $DOHYBVAR = "YES" -a $l4densvar = ".true." -a $lwrite4danl = ".true." ]; then
       $NLN $ATMA03   siga03
       $NLN $ATMI03   sigi03.nc
