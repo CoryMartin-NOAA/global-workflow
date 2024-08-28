@@ -151,15 +151,14 @@ class Analysis(Task):
         copylist = []
         for ob in observations['observers']:
             if 'obs bias' in ob.keys():
-               # obfile = ob['obs bias']['input file']
-               # obdir = os.path.dirname(obfile)
-               # basename = os.path.basename(obfile)
-               # prefix = '.'.join(basename.split('.')[:-2])
-               # for file in ['satbias.nc', 'satbias_cov.nc', 'tlapse.txt']:
-               #     bfile = f"{prefix}.{file}"
-               #     copylist.append([os.path.join(self.task_config.COMIN_ATMOS_ANALYSIS_PREV, bfile), os.path.join(obdir, bfile)])
+                # obfile = ob['obs bias']['input file']
+                # obdir = os.path.dirname(obfile)
+                # basename = os.path.basename(obfile)
+                # prefix = '.'.join(basename.split('.')[:-2])
+                # for file in ['satbias.nc', 'satbias_cov.nc', 'tlapse.txt']:
+                    # bfile = f"{prefix}.{file}"
+                    # copylist.append([os.path.join(self.task_config.COMIN_ATMOS_ANALYSIS_PREV, bfile), os.path.join(obdir, bfile)])
                     # TODO: Why is this specific to ATMOS?
-
 
                 coeffile = ob['obs bias']['input file']
                 basename = os.path.basename(coeffile)

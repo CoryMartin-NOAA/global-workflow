@@ -11,7 +11,7 @@ from wxflow import (AttrDict,
                     FileHandler,
                     add_to_datetime, to_fv3time, to_timedelta,
                     chdir,
-                    to_fv3time,to_YMDH,
+                    to_fv3time, to_YMDH,
                     YAMLFile, parse_j2yaml, save_as_yaml,
                     logit,
                     Executable,
@@ -155,7 +155,7 @@ class AerosolAnalysis(Analysis):
         biasfiles = glob.glob(os.path.join(self.task_config['DATA'], 'bc', '*bias*.nc4'))
         copylist = []
         for biasfile in biasfiles:
-            if  biasfile.endswith(f'{to_YMDH(self.task_config.current_cycle)}.nc4'):
+            if biasfile.endswith(f'{to_YMDH(self.task_config.current_cycle)}.nc4'):
                 basename = os.path.basename(biasfile)
                 copylist.append([biasfile, os.path.join(self.task_config.COMOUT_CHEM_ANALYSIS, basename)])
         FileHandler({'copy': copylist}).sync()
