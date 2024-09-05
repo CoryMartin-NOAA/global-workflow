@@ -20,6 +20,7 @@ from pygfs.task.analysis import Analysis
 
 logger = getLogger(__name__.split('.')[-1])
 
+
 class StatAnalysis(Analysis):
     """
     Class for global stat analysis tasks
@@ -57,5 +58,3 @@ class StatAnalysis(Analysis):
         dest = os.path.join(self.task_config.DATA, "stats")
         statlist = [aerostat, dest]
         FileHandler({'copy': statlist}).sync()
-
-    
