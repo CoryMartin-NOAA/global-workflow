@@ -1744,13 +1744,13 @@ class GFSTasks(Tasks):
         if self.app_config.do_jediatmvar:
             dep_dict = {'type': 'task', 'name': f'{self.run}atmanlfinal'}
             deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_jediocnvar:
+        if self.app_config.do_jediocnvar:
             dep_dict = {'type': 'task', 'name': f'{self.run}ocnanalpost'}
             deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_jedisnowda:
+        if self.app_config.do_jedisnowda:
             dep_dict = {'type': 'task', 'name': f'{self.run}snowanl'}
             deps.append(rocoto.add_dependency(dep_dict))
-        if self.do_aero:
+        if self.app_config.do_aero:
             dep_dict = {'type': 'task', 'name': f'{self.run}aeroanlfinal'}
             deps.append(rocoto.add_dependency(dep_dict))
 
