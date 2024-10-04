@@ -47,14 +47,25 @@ class StatAnalysis(Task):
         super().__init__(config)
 
         _res = int(self.task_config.CASE[1:])
-        _res_anl = int(self.task_config.CASE_ANL[1:])
+        # _res_anl = int(self.task_config.CASE_ANL[1:])
         _window_begin = add_to_datetime(self.task_config.current_cycle, -to_timedelta(f"{self.task_config.assim_freq}H") / 2)
+        print(_window_begin)
 
         # Create a local dictionary that is repeatedly used across this class
         local_dict = AttrDict(
             {
+                'npx_ges': _res + 1,
+                'npy_ges': _res + 1,
+                'npz_ges': self.task_config.LEVS - 1,
+                'npz': self.task_config.LEVS - 1,
+                #'npx_anl': _res_anl + 1,
+                #'npy_anl': _res_anl + 1,
+                'npz_anl': self.task_config.LEVS - 1,
+                'ATM_WINDOW_BEGIN': _window_begin,
+                'ATM_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
+                'OPREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'APREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
-                'jedi_yaml': _letkfoi_yaml
+                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z."
             }
         )
 
@@ -116,7 +127,8 @@ class StatAnalysis(Task):
 
         logger.info(f"Copying files to {self.task_config.DATA}/stats")
 
-        aerostat = os.path.join(self.task_config.COM_CHEM_ANALYSIS, f"{self.task_config['APREFIX']}aerostat")
+        aerostat = os.path.join(self.task_config.COM_CHEM_ANALYSIS_TMPL, f"{self.task_config['APREFIX']}aerostat")
         dest = os.path.join(self.task_config.DATA, "stats")
-        statlist = [aerostat, dest]
+        statlist = [[aerostat, dest]]
+        #print(${MEMDIR})
         FileHandler({'copy': statlist}).sync()
