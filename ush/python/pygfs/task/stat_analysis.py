@@ -127,8 +127,7 @@ class StatAnalysis(Task):
 
         logger.info(f"Copying files to {self.task_config.DATA}/stats")
 
-        aerostat = os.path.join(self.task_config.COM_CHEM_ANALYSIS_TMPL, f"{self.task_config['APREFIX']}aerostat")
+        aerostat = os.path.join(self.task_config.COM_CHEM_ANALYSIS, f"{self.task_config['APREFIX']}aerostat")
         dest = os.path.join(self.task_config.DATA, "stats")
         statlist = [[aerostat, dest]]
-        #print(${MEMDIR})
         FileHandler({'copy': statlist}).sync()
