@@ -23,5 +23,5 @@ if __name__ == '__main__':
     StatAnl = StatAnalysis(config, 'statanlvar')
 
     # Initialize JEDI variational analysis
-    StatAnl.initialize_jedi()
     StatAnl.initialize_analysis()
+    StatAnl.initialize_jedi()

@@ -58,8 +58,8 @@ class StatAnalysis(Task):
                 'npy_ges': _res + 1,
                 'npz_ges': self.task_config.LEVS - 1,
                 'npz': self.task_config.LEVS - 1,
-                #'npx_anl': _res_anl + 1,
-                #'npy_anl': _res_anl + 1,
+                # 'npx_anl': _res_anl + 1,
+                # 'npy_anl': _res_anl + 1,
                 'npz_anl': self.task_config.LEVS - 1,
                 'ATM_WINDOW_BEGIN': _window_begin,
                 'ATM_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
@@ -127,7 +127,23 @@ class StatAnalysis(Task):
 
         logger.info(f"Copying files to {self.task_config.DATA}/stats")
 
+        # Copy stat files to DATA path
         aerostat = os.path.join(self.task_config.COM_CHEM_ANALYSIS, f"{self.task_config['APREFIX']}aerostat")
-        dest = os.path.join(self.task_config.DATA, "stats")
+        dest = os.path.join(self.task_config.DATA, "aerostats")
         statlist = [[aerostat, dest]]
         FileHandler({'copy': statlist}).sync()
+
+        # Open tar file
+        logger.info(f"Open tarred stat file in {dest}")
+        with tarfile.open(dest, "r") as tar:
+            # Extract all files to the current directory
+            tar.extractall()
+
+        # Gunzip .nc files
+        logger.info("Gunzip files from tar file")
+        gz_files = glob.glob(os.path.join(self.task_config.DATA, "*gz"))
+
+        for diagfile in gz_files:
+            with gzip.open(diagfile, 'rb') as f_in:
+                with open(diagfile[:-3], 'wb') as f_out:
+                    f_out.write(f_in.read())
