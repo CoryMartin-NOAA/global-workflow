@@ -112,11 +112,11 @@ class SnowAnalysis(Task):
 
         This method will initialize a global snow analysis.
         This includes:
+        - staging model backgrounds
         - staging observation files
         - preprocessing IMS snow cover
         - staging FV3-JEDI fix files
         - staging B error files
-        - staging model backgrounds
         - creating output directories
 
         Parameters
@@ -128,6 +128,20 @@ class SnowAnalysis(Task):
         None
         """
         super().initialize()
+
+        # stage backgrounds
+        logger.info(f"Staging background files from {self.task_config.VAR_BKG_STAGING_YAML}")
+        bkg_staging_dict = parse_j2yaml(self.task_config.VAR_BKG_STAGING_YAML, self.task_config)
+        FileHandler(bkg_staging_dict).sync()
+        logger.debug(f"Background files:\n{pformat(bkg_staging_dict)}")
+
+        # need output dir for diags and anl
+        logger.debug("Create empty output [anl, diags] directories to receive output from executable")
+        newdirs = [
+            os.path.join(self.task_config.DATA, 'anl'),
+            os.path.join(self.task_config.DATA, 'diags'),
+        ]
+        FileHandler({'mkdir': newdirs}).sync()
 
     @logit(logger)
     def prepare_IMS(self) -> None:
