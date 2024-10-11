@@ -13,28 +13,44 @@ from wxflow import (AttrDict,
                     rm_p,
                     parse_j2yaml, save_as_yaml,
                     Jinja,
+                    Task,
                     logit,
                     Executable,
                     WorkflowException)
-from pygfs.task.analysis import Analysis
+from pygfs.jedi import Jedi
 
 logger = getLogger(__name__.split('.')[-1])
 
 
-class SnowAnalysis(Analysis):
+class SnowAnalysis(Task):
     """
-    Class for global snow analysis tasks
+    Class for JEDI-based global snow analysis tasks
     """
-
-    NMEM_SNOWENS = 2
 
     @logit(logger, name="SnowAnalysis")
-    def __init__(self, config):
+    def __init__(self, config: Dict[str, Any], yaml_name: Optional[str] = None):
+        """Constructor global snow analysis task
+
+        This method will construct a global snow analysis task.
+        This includes:
+        - extending the task_config attribute AttrDict to include parameters required for this task
+        - instantiate the Jedi attribute object
+
+        Parameters
+        ----------
+        config: Dict
+            dictionary object containing task configuration
+        yaml_name: str, optional
+            name of YAML file for JEDI configuration
+
+        Returns
+        ----------
+        None
+        """
         super().__init__(config)
 
         _res = int(self.task_config['CASE'][1:])
         _window_begin = add_to_datetime(self.task_config.current_cycle, -to_timedelta(f"{self.task_config['assim_freq']}H") / 2)
-        _letkfoi_yaml = os.path.join(self.task_config.DATA, f"{self.task_config.RUN}.t{self.task_config['cyc']:02d}z.letkfoi.yaml")
 
         # Create a local dictionary that is repeatedly used across this class
         local_dict = AttrDict(
@@ -47,12 +63,71 @@ class SnowAnalysis(Analysis):
                 'SNOW_WINDOW_LENGTH': f"PT{self.task_config['assim_freq']}H",
                 'OPREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'APREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
-                'jedi_yaml': _letkfoi_yaml
+                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z.",
+                'snow_obsdatain_path': f"{self.task_config.DATA}/obs/",
+                'snow_obsdataout_path': f"{self.task_config.DATA}/diags/",
             }
         )
 
         # Extend task_config with local_dict
         self.task_config = AttrDict(**self.task_config, **local_dict)
+
+        # Create JEDI object
+        self.jedi = Jedi(self.task_config, yaml_name)
+
+    @logit(logger)
+    def initialize_jedi(self):
+        """Initialize JEDI application
+
+        This method will initialize a JEDI application used in the global snow analysis.
+        This includes:
+        - generating and saving JEDI YAML config
+        - linking the JEDI executable
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        ----------
+        None
+        """
+
+        # get JEDI-to-FV3 increment converter config and save to YAML file
+        logger.info(f"Generating JEDI YAML config: {self.jedi.yaml}")
+        self.jedi.set_config(self.task_config)
+        logger.debug(f"JEDI config:\n{pformat(self.jedi.config)}")
+
+        # save JEDI config to YAML file
+        logger.debug(f"Writing JEDI YAML config to: {self.jedi.yaml}")
+        save_as_yaml(self.jedi.config, self.jedi.yaml)
+
+        # link JEDI executable
+        logger.info(f"Linking JEDI executable {self.task_config.JEDIEXE} to {self.jedi.exe}")
+        self.jedi.link_exe(self.task_config)
+
+    @logit(logger)
+    def initialize_analysis(self) -> None:
+        """Initialize a global snow analysis
+
+        This method will initialize a global snow analysis.
+        This includes:
+        - staging observation files
+        - preprocessing IMS snow cover
+        - staging FV3-JEDI fix files
+        - staging B error files
+        - staging model backgrounds
+        - creating output directories
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        ----------
+        None
+        """
+        super().initialize()
 
     @logit(logger)
     def prepare_IMS(self) -> None:
@@ -411,50 +486,6 @@ class SnowAnalysis(Analysis):
         }
 
         return bkg_dict
-
-    @staticmethod
-    @logit(logger)
-    def create_ensemble(vname: str, bestddev: float, config: Dict) -> None:
-        """Create a 2-member ensemble for Snow Depth analysis by perturbing snow depth with a prescribed variance.
-        Additionally, remove glacier locations
-
-        Parameters
-        ----------
-        vname : str
-            snow depth variable to perturb: "snodl"
-        bestddev : float
-            Background Error Standard Deviation to perturb around to create ensemble
-        config: Dict
-            Dictionary of key-value pairs needed in this method.  It must contain the following keys:
-            DATA
-            current_cycle
-            ntiles
-        """
-
-        # 2 ens members
-        offset = bestddev / np.sqrt(SnowAnalysis.NMEM_SNOWENS)
-
-        logger.info(f"Creating ensemble for LETKFOI by offsetting with {offset}")
-
-        workdir = os.path.join(config.DATA, 'bkg')
-
-        sign = [1, -1]
-        ens_dirs = ['mem001', 'mem002']
-
-        for (memchar, value) in zip(ens_dirs, sign):
-            logger.debug(f"creating ensemble member {memchar} with sign {value}")
-            for tt in range(1, config.ntiles + 1):
-                logger.debug(f"perturbing tile {tt}")
-                # open file
-                out_netcdf = os.path.join(workdir, memchar, 'RESTART', f"{to_fv3time(config.current_cycle)}.sfc_data.tile{tt}.nc")
-                logger.debug(f"creating member {out_netcdf}")
-                with Dataset(out_netcdf, "r+") as ncOut:
-                    slmsk_array = ncOut.variables['slmsk'][:]
-                    vtype_array = ncOut.variables['vtype'][:]
-                    slmsk_array[vtype_array == 15] = 0  # remove glacier locations
-                    var_array = ncOut.variables[vname][:]
-                    var_array[slmsk_array == 1] = var_array[slmsk_array == 1] + value * offset
-                    ncOut.variables[vname][0, :, :] = var_array[:]
 
     @staticmethod
     @logit(logger)
