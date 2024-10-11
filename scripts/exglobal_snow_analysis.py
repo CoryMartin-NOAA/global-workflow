@@ -24,10 +24,8 @@ if __name__ == '__main__':
     SnowAnl.initialize_jedi()
     SnowAnl.initialize_analysis()
 
-    # Run IMS preprocessing
-
     # Execute JEDI snow analysis
-    SnowAnl.execute(config.APRUN_SNOWANLVAR, ['fv3jedi', 'variational'])
+    SnowAnl.execute(config.APRUN_SNOWANL, ['fv3jedi', 'variational'])
 
     # Finalize JEDI snow analysis
     SnowAnl.finalize()
