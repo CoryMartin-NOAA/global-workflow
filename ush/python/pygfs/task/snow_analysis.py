@@ -114,7 +114,6 @@ class SnowAnalysis(Task):
         This includes:
         - staging model backgrounds
         - staging observation files
-        - preprocessing IMS snow cover
         - staging FV3-JEDI fix files
         - staging B error files
         - creating output directories
@@ -134,6 +133,29 @@ class SnowAnalysis(Task):
         bkg_staging_dict = parse_j2yaml(self.task_config.VAR_BKG_STAGING_YAML, self.task_config)
         FileHandler(bkg_staging_dict).sync()
         logger.debug(f"Background files:\n{pformat(bkg_staging_dict)}")
+
+        # stage observations
+        logger.info(f"Staging list of observation files generated from JEDI config")
+        obs_dict = self.jedi.get_obs_dict(self.task_config)
+        FileHandler(obs_dict).sync()
+        logger.debug(f"Observation files:\n{pformat(obs_dict)}")
+
+        # stage GTS bufr2ioda mapping YAML files
+        logger.info(f"Staging GTS bufr2ioda mapping YAML files from {self.task_config.GTS_SNOW_STAGE_YAML}")
+        gts_mapping_list = parse_j2yaml(self.task_config.GTS_SNOW_STAGE_YAML, self.task_config)
+        FileHandler(gts_mapping_list).sync()
+
+        # stage FV3-JEDI fix files
+        logger.info(f"Staging JEDI fix files from {self.task_config.JEDI_FIX_YAML}")
+        jedi_fix_dict = parse_j2yaml(self.task_config.JEDI_FIX_YAML, self.task_config)
+        FileHandler(jedi_fix_dict).sync()
+        logger.debug(f"JEDI fix files:\n{pformat(jedi_fix_dict)}")
+
+        # staging B error files
+        logger.info("Stage files for static background error")
+        berror_staging_dict = parse_j2yaml(self.task_config.BERROR_STAGING_YAML, self.task_config)
+        FileHandler(berror_staging_dict).sync()
+        logger.debug(f"Background error files:\n{pformat(berror_staging_dict)}")        
 
         # need output dir for diags and anl
         logger.debug("Create empty output [anl, diags] directories to receive output from executable")
@@ -243,107 +265,31 @@ class SnowAnalysis(Task):
             FileHandler(prep_ims_config.ims2ioda).sync()
 
     @logit(logger)
-    def initialize(self) -> None:
-        """Initialize method for snow analysis
-        This method:
-        - creates artifacts in the DATA directory by copying fix files
-        - creates the JEDI LETKF yaml from the template
-        - stages backgrounds, observations and ensemble members
+    def execute(self, aprun_cmd: str, jedi_args: Optional[str] = None) -> None:
+        """Run JEDI executable
+
+        This method will run JEDI executables for the global snow analysis
 
         Parameters
         ----------
-        self : Analysis
-            Instance of the SnowAnalysis object
-        """
+        aprun_cmd : str
+           Run command for JEDI application on HPC system
+        jedi_args : List
+           List of additional optional arguments for JEDI application
 
-        super().initialize()
-
-        # create a temporary dict of all keys needed in this method
-        localconf = AttrDict()
-        keys = ['PARMgfs', 'DATA', 'current_cycle', 'COM_OBS', 'COM_ATMOS_RESTART_PREV',
-                'OPREFIX', 'CASE', 'OCNRES', 'ntiles']
-        for key in keys:
-            localconf[key] = self.task_config[key]
-
-        # Make member directories in DATA for background
-        dirlist = []
-        for imem in range(1, SnowAnalysis.NMEM_SNOWENS + 1):
-            dirlist.append(os.path.join(localconf.DATA, 'bkg', f'mem{imem:03d}'))
-        FileHandler({'mkdir': dirlist}).sync()
-
-        # stage fix files
-        logger.info(f"Staging JEDI fix files from {self.task_config.JEDI_FIX_YAML}")
-        jedi_fix_list = parse_j2yaml(self.task_config.JEDI_FIX_YAML, self.task_config)
-        FileHandler(jedi_fix_list).sync()
-
-        # stage backgrounds
-        logger.info("Staging ensemble backgrounds")
-        FileHandler(self.get_ens_bkg_dict(localconf)).sync()
-
-        # stage GTS bufr2ioda mapping YAML files
-        logger.info(f"Staging GTS bufr2ioda mapping YAML files from {self.task_config.GTS_SNOW_STAGE_YAML}")
-        gts_mapping_list = parse_j2yaml(self.task_config.GTS_SNOW_STAGE_YAML, localconf)
-        FileHandler(gts_mapping_list).sync()
-
-        # Write out letkfoi YAML file
-        save_as_yaml(self.task_config.jedi_config, self.task_config.jedi_yaml)
-        logger.info(f"Wrote letkfoi YAML to: {self.task_config.jedi_yaml}")
-
-        # need output dir for diags and anl
-        logger.info("Create empty output [anl, diags] directories to receive output from executable")
-        newdirs = [
-            os.path.join(localconf.DATA, "anl"),
-            os.path.join(localconf.DATA, "diags"),
-        ]
-        FileHandler({'mkdir': newdirs}).sync()
-
-    @logit(logger)
-    def execute(self) -> None:
-        """Run a series of tasks to create Snow analysis
-        This method:
-        - creates an 2 member ensemble
-        - runs the JEDI LETKF executable to produce increments
-        - creates analysis from increments
-
-        Parameters
+        Returns
         ----------
-        self : Analysis
-           Instance of the SnowAnalysis object
+        None
         """
 
-        # create a temporary dict of all keys needed in this method
-        localconf = AttrDict()
-        keys = ['HOMEgfs', 'DATA', 'current_cycle',
-                'COM_ATMOS_RESTART_PREV', 'COM_SNOW_ANALYSIS', 'APREFIX',
-                'SNOWDEPTHVAR', 'BESTDDEV', 'CASE', 'OCNRES', 'ntiles',
-                'APRUN_SNOWANL', 'JEDIEXE', 'jedi_yaml', 'DOIAU', 'SNOW_WINDOW_BEGIN',
-                'APPLY_INCR_NML_TMPL', 'APPLY_INCR_EXE', 'APRUN_APPLY_INCR']
-        for key in keys:
-            localconf[key] = self.task_config[key]
+        if jedi_args:
+            logger.info(f"Executing {self.jedi.exe} {' '.join(jedi_args)} {self.jedi.yaml}")
+        else:
+            logger.info(f"Executing {self.jedi.exe} {self.jedi.yaml}")
 
-        logger.info("Creating ensemble")
-        self.create_ensemble(localconf.SNOWDEPTHVAR,
-                             localconf.BESTDDEV,
-                             AttrDict({key: localconf[key] for key in ['DATA', 'ntiles', 'current_cycle']}))
-
-        logger.info("Running JEDI LETKF")
-        exec_cmd = Executable(localconf.APRUN_SNOWANL)
-        exec_name = os.path.join(localconf.DATA, 'gdas.x')
-        exec_cmd.add_default_arg(exec_name)
-        exec_cmd.add_default_arg('fv3jedi')
-        exec_cmd.add_default_arg('localensembleda')
-        exec_cmd.add_default_arg(localconf.jedi_yaml)
-
-        try:
-            logger.debug(f"Executing {exec_cmd}")
-            exec_cmd()
-        except OSError:
-            raise OSError(f"Failed to execute {exec_cmd}")
-        except Exception:
-            raise WorkflowException(f"An error occured during execution of {exec_cmd}")
-
-        logger.info("Creating analysis from backgrounds and increments")
-        self.add_increments(localconf)
+        self.jedi.execute(self.task_config, aprun_cmd, jedi_args)
+    #logger.info("Creating analysis from backgrounds and increments")
+    #self.add_increments(localconf)
 
     @logit(logger)
     def finalize(self) -> None:

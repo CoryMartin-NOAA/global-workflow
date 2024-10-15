@@ -18,7 +18,7 @@ if __name__ == '__main__':
     config = cast_strdict_as_dtypedict(os.environ)
 
     # Instantiate the snow analysis task
-    SnowAnl = SnowAnalysis(config)
+    SnowAnl = SnowAnalysis(config, 'snowanl')
 
     # Initialize JEDI 2DVar snow analysis
     SnowAnl.initialize_jedi()
