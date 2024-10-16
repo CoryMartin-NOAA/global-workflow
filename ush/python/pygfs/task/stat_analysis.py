@@ -4,6 +4,7 @@ import os
 import glob
 import gzip
 import tarfile
+import yaml
 from logging import getLogger
 from pprint import pformat
 from typing import Optional, Dict, Any
@@ -65,7 +66,8 @@ class StatAnalysis(Task):
                 'ATM_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
                 'OPREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'APREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
-                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z."
+                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z.",
+                'OBSPACE_YAML': "/scratch1/NCEPDEV/da/Kevin.Dougherty/global-workflow/parm/stat/obspace_stat.yaml"
             }
         )
 
@@ -147,3 +149,22 @@ class StatAnalysis(Task):
             with gzip.open(diagfile, 'rb') as f_in:
                 with open(diagfile[:-3], 'wb') as f_out:
                     f_out.write(f_in.read())
+
+        # Get list of .nc4 files
+        obs_space_paths = glob.glob(os.path.join(self.task_config.DATA, "*.nc4"))
+        
+        for path in obs_space_paths:
+            filename = os.path.basename(path)
+            obspace = '_'.join(filename.split('_')[1:3])
+
+            # Load g-w obs space intermediate yaml file
+            with open(self.task_config.OBSPACE_YAML, 'r') as yaml_file:
+                parsed_yaml_file = yaml.safe_load(yaml_file)
+
+            obs_space_template = parsed_yaml_file['obs space'][obspace]['path']
+
+            # Load specific GDASApp yaml file
+            with open(obs_space_template, 'r') as obspace_yaml:
+                parsed_obspace_yaml_file = yaml.safe_load(obspace_yaml)
+
+            print("open obspace yaml and do stuff")

@@ -1,0 +1,5 @@
+obs space:
+    viirs_npp:
+        path: path/to/gdasapp/parm/stat_yamls
+    viirs_n20:
+        path: path/to/gdasapp/parm/stat_yamls
