@@ -27,5 +27,8 @@ if __name__ == '__main__':
     # Execute JEDI snow analysis
     SnowAnl.execute(config.APRUN_SNOWANL, ['fv3jedi', 'variational'])
 
+    # Add increments
+    SnowAnl.add_increments()
+
     # Finalize JEDI snow analysis
     SnowAnl.finalize()

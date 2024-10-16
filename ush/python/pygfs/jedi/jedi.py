@@ -185,7 +185,7 @@ class Jedi:
             copylist.append([os.path.join(task_config.COM_OBS, basename), obfile])
         obs_dict = {
             'mkdir': [os.path.join(task_config.DATA, 'obs')],
-            'copy': copylist
+            'copy_opt': copylist
         }
         return obs_dict
 
