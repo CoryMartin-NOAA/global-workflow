@@ -152,7 +152,7 @@ class StatAnalysis(Task):
 
         # Get list of .nc4 files
         obs_space_paths = glob.glob(os.path.join(self.task_config.DATA, "*.nc4"))
-        
+
         for path in obs_space_paths:
             filename = os.path.basename(path)
             obspace = '_'.join(filename.split('_')[1:3])
