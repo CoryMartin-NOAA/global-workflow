@@ -1,5 +1,5 @@
 obs space:
     viirs_npp:
-        path: path/to/gdasapp/parm/stat_yamls
+        path: {FIXgdas}/parm/stat/viirs_npp_template.yaml
     viirs_n20:
-        path: path/to/gdasapp/parm/stat_yamls
+        path: {FIXgdas}/parm/stat/viirs_n20_template.yaml
