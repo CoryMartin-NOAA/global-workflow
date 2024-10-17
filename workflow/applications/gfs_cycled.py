@@ -115,7 +115,7 @@ class GFSCycledAppConfig(AppConfig):
         if self.do_jedisnowda:
             configs += ['prepsnowobs', 'snowanl']
             if self.do_hybvar:
-                configs += ['esnowrecen']
+                configs += ['esnowanl', 'esnowrecen']
 
         if self.do_mos:
             configs += ['mos_stn_prep', 'mos_grd_prep', 'mos_ext_stn_prep', 'mos_ext_grd_prep',
@@ -172,7 +172,7 @@ class GFSCycledAppConfig(AppConfig):
                 hybrid_tasks += ['eobs', 'eupd', 'echgres']
                 hybrid_tasks += ['ediag'] if self.lobsdiag_forenkf else ['eomg']
             if self.do_jedisnowda:
-                hybrid_tasks += ['esnowrecen']
+                hybrid_tasks += ['esnowanl', 'esnowrecen']
             hybrid_after_eupd_tasks += ['stage_ic', 'ecen', 'esfc', 'efcs', 'epos', 'earc', 'cleanup']
 
         # Collect all "gdas" cycle tasks
@@ -303,6 +303,7 @@ class GFSCycledAppConfig(AppConfig):
             if self.do_hybvar and 'gfs' in self.eupd_runs:
                 enkfgfs_tasks = hybrid_tasks + hybrid_after_eupd_tasks
                 enkfgfs_tasks.remove("echgres")
+                enkfgfs_tasks.remove("esnowanl")
                 enkfgfs_tasks.remove("esnowrecen")
                 tasks['enkfgfs'] = enkfgfs_tasks
 
