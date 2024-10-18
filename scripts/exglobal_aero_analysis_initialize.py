@@ -20,5 +20,6 @@ if __name__ == '__main__':
     config = cast_strdict_as_dtypedict(os.environ)
 
     # Instantiate the aerosol analysis task
-    AeroAnl = AerosolAnalysis(config)
-    AeroAnl.initialize()
+    AeroAnl = AerosolAnalysis(config, 'aeroanlvar')
+    AeroAnl.initialize_jedi()
+    AeroAnl.initialize_analysis()
