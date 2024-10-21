@@ -18,9 +18,10 @@ case ${CASE} in
     exit 4
 esac
 export CASE_ANL
-export OBS_LIST="${PARMgfs}/gdas/aero/obs/lists/gdas_aero.yaml.j2"
+export JCB_BASE_YAML="${PARMgfs}/gdas/aero/jcb-base.yaml.j2"
+export JCB_ALGO_YAML=${PARMgfs}/gdas/aero/jcb-prototype_3dvar.yaml.j2
 export STATICB_TYPE='diffusion'
-export BERROR_YAML="${PARMgfs}/gdas/aero/berror/staticb_${STATICB_TYPE}.yaml.j2"
+export BERROR_YAML="aero_background_error_static_${STATICB_TYPE}"
 export BERROR_DATA_DIR="${FIXgfs}/gdas/aero/clim_b"
 
 export CRTM_FIX_YAML="${PARMgfs}/gdas/aero_crtm_coeff.yaml.j2"
@@ -33,8 +34,6 @@ export io_layout_x=@IO_LAYOUT_X@
 export io_layout_y=@IO_LAYOUT_Y@
 
 export JEDIEXE="${EXECgfs}/gdas.x"
-export BMATEXE="${EXECgfs}/gdasapp_chem_diagb.x"
-export DIFFUSIONEXE="${EXECgfs}/gdas_fv3jedi_error_covariance_toolbox.x"
 
 if [[ "${DOIAU}" == "YES" ]]; then
   export aero_bkg_times="3,6,9"

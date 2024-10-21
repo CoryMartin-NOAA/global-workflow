@@ -22,13 +22,13 @@ if __name__ == '__main__':
     # we create a BMatrix object for all 3 but only stage and finalize once each
     config['JEDIEXE'] = os.path.join(config['EXECgfs'], 'gdas.x')
     BkgInterp = AerosolBMatrix(config, 'aero_convertstate')
-    BkgInterp.initialize_jedi()
+    BkgInterp.initialize_jedi('aero_convert_background')
     config['JEDIEXE'] = os.path.join(config['EXECgfs'], 'gdas_fv3jedi_error_covariance_toolbox.x')
     BDiffusion = AerosolBMatrix(config, 'aero_diffusion')
-    BDiffusion.initialize_jedi()
+    BDiffusion.initialize_jedi('aero_gen_bmatrix_diffusion')
     config['JEDIEXE'] = os.path.join(config['EXECgfs'], 'gdasapp_chem_diagb.x')
-    BVariance = AerosolBMatrix(config, 'chem_diagb')
-    BVariance.initialize_jedi()
+    BVariance = AerosolBMatrix(config, 'aero_diagb')
+    BVariance.initialize_jedi('aero_gen_bmatrix_diagb')
 
     # Initialize the runtime directory
     BVariance.initialize_genb()

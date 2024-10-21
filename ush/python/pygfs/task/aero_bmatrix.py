@@ -72,7 +72,7 @@ class AerosolBMatrix(Task):
         self.jedi = Jedi(self.task_config, yaml_name)
 
     @logit(logger)
-    def initialize_jedi(self):
+    def initialize_jedi(self, algorithm: Optional[str] = None):
         """Initialize JEDI application
 
         This method will initialize a JEDI application used in the global aero analysis.
@@ -91,7 +91,7 @@ class AerosolBMatrix(Task):
 
         # get JEDI config
         logger.info(f"Generating JEDI YAML config: {self.jedi.yaml}")
-        self.jedi.set_config(self.task_config)
+        self.jedi.set_config(self.task_config, algorithm)
         logger.debug(f"JEDI config:\n{pformat(self.jedi.config)}")
 
         # save JEDI config to YAML file

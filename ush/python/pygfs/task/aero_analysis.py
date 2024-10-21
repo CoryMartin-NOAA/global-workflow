@@ -72,7 +72,7 @@ class AerosolAnalysis(Task):
                 'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z.",
                 'aero_obsdatain_path': f"{self.task_config.DATA}/obs/",
                 'aero_obsdataout_path': f"{self.task_config.DATA}/diags/",
-                'BKG_TSTEP': "PT1H"  # Placeholder for 4D applications
+                'BKG_TSTEP': "PT3H"  # FGAT
             }
         )
 
@@ -148,11 +148,6 @@ class AerosolAnalysis(Task):
         logger.info(f"Staging files prescribed from {self.task_config.AERO_STAGE_VARIATIONAL_TMPL}")
         aero_var_stage_list = parse_j2yaml(self.task_config.AERO_STAGE_VARIATIONAL_TMPL, self.task_config)
         FileHandler(aero_var_stage_list).sync()
-
-        # generate variational YAML file
-        logger.debug(f"Generate variational YAML file: {self.task_config.jedi_yaml}")
-        save_as_yaml(self.task_config.jedi_config, self.task_config.jedi_yaml)
-        logger.info(f"Wrote variational YAML to: {self.task_config.jedi_yaml}")
 
     @logit(logger)
     def execute(self, aprun_cmd: str, jedi_args: Optional[str] = None) -> None:
