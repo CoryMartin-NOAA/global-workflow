@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # exglobal_stat_analysis.py
 # This script creates an StatAnalysis class
 # and runs the initialize method
@@ -9,6 +10,7 @@ import os
 
 from wxflow import Logger, cast_strdict_as_dtypedict
 from pygfs.task.stat_analysis import StatAnalysis
+
 
 # Initialize root logger
 logger = Logger(level='DEBUG', colored_log=True)

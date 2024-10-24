@@ -6,11 +6,7 @@ source "${HOMEgfs}/ush/jjob_header.sh" -e "anlstat" -c "base anlstat"
 ##############################################
 # Set variables used in the script
 ##############################################
-# shellcheck disable=SC2153
-# GDATE=$(date --utc +%Y%m%d%H -d "${PDY} ${cyc} - ${assim_freq} hours")
-# gPDY=${GDATE:0:8}
-# gcyc=${GDATE:8:2}
-# GDUMP="gdas"
+
 
 ##############################################
 # Begin JOB SPECIFIC work
@@ -18,6 +14,7 @@ source "${HOMEgfs}/ush/jjob_header.sh" -e "anlstat" -c "base anlstat"
 
 # Generate COM variables from templates
 YMD=${PDY} HH=${cyc} declare_from_tmpl -rx COM_OBS COM_CHEM_ANALYSIS
+
 
 ###############################################################
 # Run relevant script
