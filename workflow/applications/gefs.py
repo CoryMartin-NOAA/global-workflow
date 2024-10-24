@@ -17,7 +17,7 @@ class GEFSAppConfig(AppConfig):
         """
         Returns the config_files that are involved in gefs
         """
-        configs = ['stage_ic', 'fcst', 'atmos_products', 'arch']
+        configs = ['stage_ic', 'fcst', 'atmos_products', 'arch', 'cleanup']
 
         if self.nens > 0:
             configs += ['efcs', 'atmos_ensstat']
@@ -42,7 +42,6 @@ class GEFSAppConfig(AppConfig):
     def _update_base(base_in):
 
         base_out = base_in.copy()
-        base_out['INTERVAL_GFS'] = AppConfig.get_gfs_interval(base_in['gfs_cyc'])
         base_out['RUN'] = 'gefs'
 
         return base_out
@@ -80,8 +79,8 @@ class GEFSAppConfig(AppConfig):
             tasks += ['wavepostpnt']
 
         if self.do_extractvars:
-            tasks += ['extractvars']
+            tasks += ['extractvars', 'arch']
 
-        tasks += ['arch']
+        tasks += ['cleanup']
 
         return {f"{self.run}": tasks}
