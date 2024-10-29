@@ -22,8 +22,7 @@ if __name__ == '__main__':
     config = cast_strdict_as_dtypedict(os.environ)
 
     # Instantiate the atm analysis task
-    StatAnl = StatAnalysis(config, 'statanlvar')
+    StatAnl = StatAnalysis(config)
 
     # Initialize JEDI variational analysis
-    StatAnl.initialize_analysis()
-    StatAnl.initialize_jedi()
+    StatAnl.initialize()
