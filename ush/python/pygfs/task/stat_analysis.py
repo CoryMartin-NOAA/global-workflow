@@ -56,15 +56,12 @@ class StatAnalysis(Task):
                 'npy_ges': _res + 1,
                 'npz_ges': self.task_config.LEVS - 1,
                 'npz': self.task_config.LEVS - 1,
-                # 'npx_anl': _res_anl + 1,
-                # 'npy_anl': _res_anl + 1,
                 'npz_anl': self.task_config.LEVS - 1,
                 'ATM_WINDOW_BEGIN': _window_begin,
                 'ATM_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
                 'OPREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'APREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
-                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z.",
-                #'OBSPACE_YAML': "/scratch1/NCEPDEV/da/Kevin.Dougherty/global-workflow/parm/stat/obspace_stat.yaml"
+                'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z."
             }
         )
 
@@ -82,8 +79,8 @@ class StatAnalysis(Task):
                 'exe_src': self.task_config.JEDIEXE,
                 'jcb_base_yaml': self.task_config.JCB_BASE_YAML,
                 'jcb_algo': 'viirs_n20_template',
-                'jcb_algo_yaml': self.task_config.JCB_ALGO_YAML, #self.task_config.JCB_ALGO_YAML_VAR,
-                'jedi_args': None #['fv3jedi', 'variational']
+                'jcb_algo_yaml': self.task_config.JCB_ALGO_YAML,
+                'jedi_args': None
             }
         ))
 
@@ -144,11 +141,5 @@ class StatAnalysis(Task):
             # Load g-w obs space intermediate yaml file
             with open(self.task_config.JCB_ALGO_YAML, 'r') as yaml_file:
                 parsed_yaml_file = yaml.safe_load(yaml_file)
-
-            # obs_space_template = parsed_yaml_file['ob spaces']
-
-            # Load specific GDASApp yaml file
-            # with open(obs_space_template, 'r') as obspace_yaml:
-            #    parsed_obspace_yaml_file = yaml.safe_load(obspace_yaml)
 
             print("open obspace yaml and do stuff")
