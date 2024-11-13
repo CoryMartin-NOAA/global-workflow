@@ -57,8 +57,8 @@ class StatAnalysis(Task):
                 'npz_ges': self.task_config.LEVS - 1,
                 'npz': self.task_config.LEVS - 1,
                 'npz_anl': self.task_config.LEVS - 1,
-                'ATM_WINDOW_BEGIN': _window_begin,
-                'ATM_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
+                'STAT_WINDOW_BEGIN': _window_begin,
+                'STAT_WINDOW_LENGTH': f"PT{self.task_config.assim_freq}H",
                 'OPREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'APREFIX': f"{self.task_config.RUN}.t{self.task_config.cyc:02d}z.",
                 'GPREFIX': f"gdas.t{self.task_config.previous_cycle.hour:02d}z."
@@ -78,7 +78,7 @@ class StatAnalysis(Task):
                 'rundir': self.task_config.DATA,
                 'exe_src': self.task_config.JEDIEXE,
                 'jcb_base_yaml': self.task_config.JCB_BASE_YAML,
-                'jcb_algo': 'viirs_n20_template',
+                'jcb_algo': 'anlstat',
                 'jcb_algo_yaml': self.task_config.JCB_ALGO_YAML,
                 'jedi_args': None
             }
@@ -102,12 +102,6 @@ class StatAnalysis(Task):
         ----------
         None
         """
-        # initialize JEDI application
-        logger.info(f"Initializing JEDI variational DA application")
-        self.jedi['statanl'].initialize(self.task_config)
-
-        self.jedi['statanl'].render_jcb(self.task_config)
-
         logger.info(f"Copying files to {self.task_config.DATA}/stats")
 
         # Copy stat files to DATA path
@@ -134,12 +128,8 @@ class StatAnalysis(Task):
         # Get list of .nc4 files
         obs_space_paths = glob.glob(os.path.join(self.task_config.DATA, "*.nc4"))
 
-        for path in obs_space_paths:
-            filename = os.path.basename(path)
-            obspace = '_'.join(filename.split('_')[1:3])
+        self.task_config.OBSPACES_LIST = ['_'.join(os.path.basename(path).split('_')[1:3]) for path in obs_space_paths]
 
-            # Load g-w obs space intermediate yaml file
-            with open(self.task_config.JCB_ALGO_YAML, 'r') as yaml_file:
-                parsed_yaml_file = yaml.safe_load(yaml_file)
-
-            print("open obspace yaml and do stuff")
+        # initialize JEDI application
+        logger.info(f"Initializing JEDI variational DA application")
+        self.jedi['statanl'].initialize(self.task_config)
