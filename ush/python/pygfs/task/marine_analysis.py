@@ -15,7 +15,7 @@ from jcb import render
 from wxflow import (AttrDict,
                     FileHandler,
                     add_to_datetime, to_timedelta, to_YMD,
-                    parse_j2yaml,
+                    parse_j2yaml, parse_yaml,
                     logit,
                     Executable,
                     Task,
@@ -233,6 +233,9 @@ class MarineAnalysis(Task):
         # convert datetime to string
         jcb_config['window_begin'] = self.task_config.MARINE_WINDOW_BEGIN.strftime('%Y-%m-%dT%H:%M:%SZ')
         jcb_config['window_middle'] = self.task_config.MARINE_WINDOW_MIDDLE.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        # Current hack so that this is not done directly in the JCB base yaml
+        jcb_config['marine_pseudo_model_states'] = parse_yaml('bkg_list.yaml')
 
         # Render the full JEDI configuration file using JCB
         jedi_config = render(jcb_config)
