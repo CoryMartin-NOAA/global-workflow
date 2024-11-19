@@ -135,4 +135,4 @@ class StatAnalysis(Task):
 
         # initialize JEDI application
         logger.info(f"Initializing JEDI variational DA application")
-        self.jedi['statanl'].initialize(self.task_config)
+        self.jedi_dict['statanl'].initialize(self.task_config)
