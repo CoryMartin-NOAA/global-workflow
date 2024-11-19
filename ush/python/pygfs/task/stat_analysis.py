@@ -68,21 +68,24 @@ class StatAnalysis(Task):
         # Extend task_config with local_dict
         self.task_config = AttrDict(**self.task_config, **local_dict)
 
-        # Create dictionary of JEDI objects
-        self.jedi = AttrDict()
+        # Create dictionary of Jedi objects
+        self.jedi_dict = Jedi.get_jedi_dict(self.task_config.JEDI_CONFIG_YAML, self.task_config)
 
-        # statanlvar
-        self.jedi['statanl'] = Jedi(AttrDict(
-            {
-                'yaml_name': 'statanl',
-                'rundir': self.task_config.DATA,
-                'exe_src': self.task_config.JEDIEXE,
-                'jcb_base_yaml': self.task_config.JCB_BASE_YAML,
-                'jcb_algo': 'anlstat',
-                'jcb_algo_yaml': self.task_config.JCB_ALGO_YAML,
-                'jedi_args': None
-            }
-        ))
+        # # Create dictionary of JEDI objects
+        # self.jedi = AttrDict()
+
+        # # statanlvar
+        # self.jedi['statanl'] = Jedi(AttrDict(
+        #     {
+        #         'yaml_name': 'statanl',
+        #         'rundir': self.task_config.DATA,
+        #         'exe_src': self.task_config.JEDIEXE,
+        #         'jcb_base_yaml': self.task_config.JCB_BASE_YAML,
+        #         'jcb_algo': 'anlstat',
+        #         'jcb_algo_yaml': self.task_config.JCB_ALGO_YAML,
+        #         'jedi_args': None
+        #     }
+        # ))
 
     @logit(logger)
     def initialize(self) -> None:
