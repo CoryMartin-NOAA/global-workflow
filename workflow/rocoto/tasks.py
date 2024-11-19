@@ -19,9 +19,8 @@ class Tasks:
                    'earc', 'ecen', 'echgres', 'ediag', 'efcs',
                    'eobs', 'eomg', 'epos', 'esfc', 'eupd',
                    'atmensanlinit', 'atmensanlobs', 'atmensanlsol', 'atmensanlletkf', 'atmensanlfv3inc', 'atmensanlfinal',
-                   'aeroanlinit', 'aeroanlvar', 'aeroanlfinal', 'aeroanlgenb',
-                   'snowanl', 'esnowrecen',
-                   'anlstat',
+                   'aeroanlinit', 'aeroanlvar', 'aeroanlfinal', 'aeroanlgenb',=
+                   'snowanl', 'esnowrecen', 'anlstat',
                    'fcst',
                    'atmanlupp', 'atmanlprod', 'atmupp', 'goesupp',
                    'atmos_prod', 'ocean_prod', 'ice_prod',
