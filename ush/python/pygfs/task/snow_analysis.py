@@ -102,6 +102,10 @@ class SnowAnalysis(Task):
         ----------
         None
         """
+        # copy default JCB observation chronicles to runtime directory
+
+        # modify chronicles given optional manual input file
+        
         # initialize JEDI variational application
         logger.info(f"Initializing JEDI variational DA application")
         self.jedi_dict['snowanlvar'].initialize(self.task_config)
@@ -317,6 +321,8 @@ class SnowAnalysis(Task):
                 'copy': [[src, dest]]
             }
             FileHandler(yaml_copy).sync()
+
+        # tar up JCB chronicles and copy to ROTDIR
 
         logger.info("Copy analysis to COM")
         bkgtimes = []
