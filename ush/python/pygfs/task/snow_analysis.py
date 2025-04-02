@@ -105,7 +105,7 @@ class SnowAnalysis(Task):
         # copy default JCB observation chronicles to runtime directory
 
         # modify chronicles given optional manual input file
-        
+
         # initialize JEDI variational application
         logger.info(f"Initializing JEDI variational DA application")
         self.jedi_dict['snowanlvar'].initialize(self.task_config)
