@@ -24,26 +24,40 @@ fi
 last_date=$(date --utc +%Y%m%d%H -d "${PDY} ${cyc} -${RMOLDEND:-24} hours")
 first_date=$(date --utc +%Y%m%d%H -d "${PDY} ${cyc} -${RMOLDSTD:-120} hours")
 last_rtofs=$(date --utc +%Y%m%d%H -d "${PDY} ${cyc} -${RMOLDRTOFS:-48} hours")
+
 function remove_files() {
     local directory=$1
     shift
-    if [[ ! -d ${directory} ]]; then
-        echo "No directory ${directory} to remove files from, skiping"
+
+    if [[ ! -d "${directory}" ]]; then
+        echo "No directory ${directory} to remove files from, skipping"
         return
     fi
-    local find_exclude_string=""
-    for exclude in "$@"; do
-        find_exclude_string+="${find_exclude_string} -name ${exclude} -or"
-    done
-    # Chop off any trailing or
-    find_exclude_string="${find_exclude_string[*]/%-or}"
-    # Remove all regular files that do not match
-    # shellcheck disable=SC2086
-    find "${directory}" -type f -not \( ${find_exclude_string} \) -ignore_readdir_race -delete
-    # Remove all symlinks that do not match
-    # shellcheck disable=SC2086
-    find "${directory}" -type l -not \( ${find_exclude_string} \) -ignore_readdir_race -delete
-    # Remove any empty directories
+
+    local find_args=()
+
+    if [[ "$#" -gt 0 ]]; then
+        find_args+=( \( )
+        local first=1
+        for exclude in "$@"; do
+            if [[ -n "$exclude" ]]; then
+                [[ $first -eq 0 ]] && find_args+=( -or )
+                find_args+=( -name "$exclude" )
+                first=0
+            fi
+        done
+        find_args+=( \) )
+    fi
+
+    if [[ "${#find_args[@]}" -gt 0 ]]; then
+        find "${directory}" -type f -not "${find_args[@]}" -ignore_readdir_race -delete
+        find "${directory}" -type l -not "${find_args[@]}" -ignore_readdir_race -delete
+    else
+        echo "WARNING: No exclusion patterns provided. Deleting all files and symlinks in ${directory}."
+        find "${directory}" -type f -ignore_readdir_race -delete
+        find "${directory}" -type l -ignore_readdir_race -delete
+    fi
+
     find "${directory}" -type d -empty -delete
 }
 
@@ -63,7 +77,7 @@ for (( current_date=first_date; current_date <= last_date; \
                 IFS=", " read -r -a exclude_list <<< "${exclude_string:-}"
                 remove_files "${COMOUT_TOP}" "${exclude_list[@]:-}"
             fi
-            if [[ -d "${rtofs_dir}" ]] && (( current_date < last_rtofs )); then rm -rf "${rtofs_dir}" ; fi
+            if [[ -d "${rtofs_dir}" ]] && (( current_date < last_rtofs )); then rm -rf "${rtofs_dir}"; fi
         fi
     fi
 done
@@ -104,3 +118,4 @@ if [[ -d ${deletion_target} ]]; then rm -rf "${deletion_target}"; fi
 
 # sync and wait to avoid filesystem synchronization issues
 sync && sleep 1
+
