@@ -8,4 +8,7 @@ echo "BEGIN: config.prepatmiodaobs"
 # Get task specific resources
 . "${EXPDIR}/config.resources" prepatmiodaobs
 
+# do we process these observations in line or copy observations from ObsForge?
+export DO_CONVERT_IODA="YES"
+
 echo "END: config.prepatmiodaobs"

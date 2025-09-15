@@ -17,6 +17,8 @@ YMD=${PDY} HH=${cyc} declare_from_tmpl -rx \
 # Run relevant script
 EXSCRIPT=${BUFR2IODASH:-${USHgfs}/run_bufr2ioda.py} # FIXME: A j-job should call ex-script, not an ush-script! See EE2 standards
 ${EXSCRIPT} "${PDY}${cyc}" "${RUN}" "${DMPDIR}" "${PARMgfs}/gdas/ioda/bufr2ioda" "${COMOUT_OBS}/" && true
+EXSCRIPT=${EXPREPATMIODAPY:-${SCRgfs}/exglobal_prep_atm_ioda_obs.py}
+${EXSCRIPT} && true
 export err=$?
 set +x
 if [[ ${err} -ne 0 ]]; then
