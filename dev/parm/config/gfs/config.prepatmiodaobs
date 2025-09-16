@@ -10,5 +10,6 @@ echo "BEGIN: config.prepatmiodaobs"
 
 # do we process these observations in line or copy observations from ObsForge?
 export DO_CONVERT_IODA="YES"
+export STAGE_COM_IODA_OBS_YAML="${PARMgfs}/gdas/atm/atm_com_stage_ioda.yaml.j2"
 
 echo "END: config.prepatmiodaobs"

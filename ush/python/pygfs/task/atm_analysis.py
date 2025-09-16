@@ -12,6 +12,7 @@ from wxflow import (AttrDict, FileHandler, Task,
                     parse_j2yaml,
                     logit)
 from pygfs.jedi import Jedi
+from run_bufr2ioda import bufr2ioda
 
 logger = getLogger(__name__.split('.')[-1])
 
@@ -283,3 +284,47 @@ class AtmAnalysis(Task):
 
     def clean(self):
         super().clean()
+
+    @logit(logger)
+    def generate_ioda_obs(self) -> None:
+        """
+        Generate IODA formatted atmospheric observations
+
+        This method will generate IODA formatted atmospheric observations
+        using the bufr2ioda.py script.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        ----------
+        None
+        """
+        # Call the GDASApp BUFR2IODA function
+        bufr2ioda(self.task_config.current_cycle, self.task_config.RUN, self.task_config.DMPDIR,
+                  os.path.join(self.task_config.PARMgfs, 'gdas', 'ioda', 'bufr2ioda'),
+                  self.task_config.COMOUT_OBS)
+    
+    @logit(logger)
+    def stage_ioda_obs(self) -> None:
+        """
+        Stage IODA formatted atmospheric observations
+
+        This method will stage IODA formatted atmospheric observations
+        from the COMINobsforge directory to the local COM directory.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        ----------
+        None
+        """
+
+        # stage observations
+        logger.info(f"Staging list of IODA observation files from {self.task_config.COMINobsforge}")
+        obs_dict = parse_j2yaml(self.task_config.STAGE_COM_IODA_OBS_YAML, self.task_config)
+        FileHandler(obs_dict).sync()
+        logger.debug(f"Staged IODA observation files:\n{pformat(obs_dict)}")

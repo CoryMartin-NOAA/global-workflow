@@ -6,7 +6,7 @@
 import os
 
 from wxflow import Logger, cast_strdict_as_dtypedict
-from pygfs.task.aero_prepobs import AerosolObsPrep
+from pygfs.task.atm_analysis import AtmAnalysis
 
 # Initialize root logger
 logger = Logger(level='DEBUG', colored_log=True)
@@ -17,9 +17,15 @@ if __name__ == '__main__':
     # Take configuration from environment and cast it as python dictionary
     config = cast_strdict_as_dtypedict(os.environ)
 
-    # AeroObs = AerosolObsPrep(config)
-    if config.DO_CONVERT_IODA:
-        print('processing observations into IODA format')
+    # Instantiate the atm analysis task
+    AtmAnl = AtmAnalysis(config)
+
+    #EXSCRIPT=${BUFR2IODASH:-${USHgfs}/run_bufr2ioda.py} # FIXME: A j-job should call ex-script, not an ush-script! See EE2 standards
+    #${EXSCRIPT} "${PDY}${cyc}" "${RUN}" "${DMPDIR}" "${PARMgfs}/gdas/ioda/bufr2ioda" "${COMOUT_OBS}/" && true
+    if AtmAnl.task_config.DO_CONVERT_IODA:
+        logger.info('converting observations to IODA format')
+        AtmAnl.generate_ioda_obs()
     else:
         # just sync files from COMINobsforge
-        print('syncing files from COMINobsforge')
+        logger.info('syncing files from COMINobsforge')
+        AtmAnl.stage_ioda_obs()
