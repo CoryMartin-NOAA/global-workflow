@@ -305,7 +305,7 @@ class AtmAnalysis(Task):
         bufr2ioda(self.task_config.current_cycle, self.task_config.RUN, self.task_config.DMPDIR,
                   os.path.join(self.task_config.PARMgfs, 'gdas', 'ioda', 'bufr2ioda'),
                   self.task_config.COMOUT_OBS)
-    
+
     @logit(logger)
     def stage_ioda_obs(self) -> None:
         """

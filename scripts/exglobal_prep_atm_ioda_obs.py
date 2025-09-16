@@ -20,8 +20,6 @@ if __name__ == '__main__':
     # Instantiate the atm analysis task
     AtmAnl = AtmAnalysis(config)
 
-    #EXSCRIPT=${BUFR2IODASH:-${USHgfs}/run_bufr2ioda.py} # FIXME: A j-job should call ex-script, not an ush-script! See EE2 standards
-    #${EXSCRIPT} "${PDY}${cyc}" "${RUN}" "${DMPDIR}" "${PARMgfs}/gdas/ioda/bufr2ioda" "${COMOUT_OBS}/" && true
     if AtmAnl.task_config.DO_CONVERT_IODA:
         logger.info('converting observations to IODA format')
         AtmAnl.generate_ioda_obs()
