@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-source "${HOMEgfs}/ush/jjob_header.sh" -e "prepatmiodaobs" -c "base prepatmiodaobs"
+source "${HOMEgfs}/ush/jjob_header.sh" -e "prepatmiodaobs" -c "base atmanl prepatmiodaobs"
 
 ##############################################
 # Set variables used in the script
