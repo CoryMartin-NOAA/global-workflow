@@ -22,7 +22,7 @@ if [[ ! -s "${TARGET_DIR}" ]]; then
 fi
 
 # Set file prefix
-prefix="${RUN}.t${HH}z."
+prefix="gdas.t${HH}z."
 
 # Link dump files from SOURCE_DIR to TARGET_DIR
 cd "${SOURCE_DIR}"

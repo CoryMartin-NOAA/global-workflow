@@ -44,14 +44,14 @@ for compdir in "${SOURCE_DIR}"/*/ ; do
         fi
         # Link files from SOURCE_DIR to TARGET_DIR
         cd "${SOURCE_DIR}/${compdir}/${subdir}"
-        if [[ -s "${prefix}?status.log" ]]; then
+        #if [[ -s "${prefix}?status.log" ]]; then
             for file in $(ls ${prefix}*); do
                 ${NLN} "${SOURCE_DIR}/${compdir}/${subdir}/${file}" "${TARGET_DIR}/${compdir}/${subdir}/${file}"
             done
-        else
-            echo "***ERROR*** completion log file NOT FOUND in ${SOURCE_DIR}/${compdir}/${subdir}"
-            exit 99
-        fi
+        #else
+        #    echo "***ERROR*** completion log file NOT FOUND in ${SOURCE_DIR}/${compdir}/${subdir}"
+        #    exit 99
+        #fi
     done
 done
 

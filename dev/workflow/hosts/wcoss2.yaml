@@ -1,6 +1,6 @@
 # Paths
 DMPDIR: '/lfs/h2/emc/dump/noscrub/dump'
-IODADIR: '' #TODO: This does not yet exist.
+IODADIR: '/lfs/h2/emc/da/noscrub/mindo.choi/MARINE_obs/COMROOT/realtime'
 BASE_GIT: '/lfs/h2/emc/global/save/emc.global/git'
 BASE_DATA: '/lfs/h2/emc/global/noscrub/emc.global/data'
 BASE_IC: '/lfs/h2/emc/global/noscrub/emc.global/data/ICSDIR'
@@ -26,4 +26,4 @@ CHGRP_RSTPROD: 'YES'
 CHGRP_CMD: 'chgrp rstprod'
 # Features
 SUPPORTED_RESOLUTIONS: ['C1152', 'C768', 'C384', 'C192', 'C96', 'C48']
-DO_ARCHCOM: 'NO'
+DO_ARCHCOM: 'YES'

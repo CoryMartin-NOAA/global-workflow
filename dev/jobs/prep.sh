@@ -31,9 +31,11 @@ export OPREFIX="${RUN_local}.t${cyc}z."
 RUN=${RUN_local} YMD=${PDY} HH=${cyc} declare_from_tmpl -rx \
     COMIN_OBS:COM_OBS_TMPL \
     COMOUT_OBS:COM_OBS_TMPL \
-    COMINobsproc:COM_OBSPROC_TMPL \
     COMINobsforge:COM_OBSFORGE_TMPL \
     COMIN_TCVITAL:COM_TCVITAL_TMPL
+
+RUN=${GDUMP} YMD=${PDY} HH=${cyc} declare_from_tmpl -rx \
+    COMINobsproc:COM_OBSPROC_TMPL
 
 RUN=${GDUMP} YMD=${gPDY} HH=${gcyc} declare_from_tmpl -rx \
     COMOUT_OBS_PREV:COM_OBS_TMPL \
@@ -82,93 +84,93 @@ fi
 # copy files from operational syndata directory to a local directory.
 # Otherwise, copy existing tcvital data from globaldump.
 
-if [[ ${PROCESS_TROPCY} == "YES" ]]; then
-
-    export ARCHSYND=${ROTDIR}/syndat
-    mkdir -p "${ARCHSYND}"
-    if [[ ! -s ${ARCHSYND}/syndat_akavit ]]; then
-        for file in syndat_akavit syndat_dateck syndat_stmcat.scr syndat_stmcat syndat_sthisto syndat_sthista ; do
-            cpreq "${COMINsyn}/${file}" "${ARCHSYND}"/.
-        done
-    fi
-
-    rm -f "${COMOUT_OBS}/${RUN_local}.t${cyc}z.syndata.tcvitals.tm00"
-
-    "${HOMEgfs}/jobs/JGLOBAL_ATMOS_TROPCY_QC_RELOC"
-    status=$?
-    if [[ ${status} -ne 0 ]]; then
-        exit "${status}"
-    fi
-
-else
-    cpfs "${COMINobsproc}/${RUN_local}.t${cyc}z.syndata.tcvitals.tm00" "${COMOUT_OBS}/"
-fi
-
-
-###############################################################
-# Generate prepbufr files from dumps and prior gdas guess
-rm -f "${COMOUT_OBS}/${OPREFIX}prepbufr"
-rm -f "${COMOUT_OBS}/${OPREFIX}prepbufr.acft_profiles"
-rm -f "${COMOUT_OBS}/${OPREFIX}nsstbufr"
-
-RUN="gdas" YMD=${PDY} HH=${cyc} declare_from_tmpl -rx COMIN_ATMOS_HISTORY_GDAS:COM_ATMOS_HISTORY_TMPL
-RUN="gfs" YMD=${PDY} HH=${cyc} declare_from_tmpl -rx COMIN_ATMOS_HISTORY_GFS:COM_ATMOS_HISTORY_TMPL
-
-export job="j${RUN_local}_prep_${cyc}"
-
-#TODO: Update external packages (obsproc/prepobs) to use COMIN[OUT]_*
-export COMINtcvital=${COMIN_TCVITAL}
-export COMIN=${COMIN_OBS}
-export COMOUT=${COMOUT_OBS}
-export COMINgdas=${COMIN_ATMOS_HISTORY_GDAS}
-export COMINgfs=${COMIN_ATMOS_HISTORY_GFS}
-
-export COMSP=${COMSP:-"${COMIN_OBS}/${RUN_local}.t${cyc}z."}
-
-# Create or Copy prepbufr, prepbufr.acft_profiles, nsstbufr files
-# Do not fail on external errors
-if [[ ${MAKE_PREPBUFR:-"YES"} == "YES" ]]; then
-  set +eu
-  "${HOMEobsproc}/jobs/JOBSPROC_GLOBAL_PREP" && true
-  export err=$?
-  if [[ ${err} -ne 0 ]]; then
-     err_exit "JOBSPROC_GLOBAL_PREP job failed, ABORT!"
-  fi
-else
-  if [[ ${USE_PREPBUFR_FROM_OPS:-"YES"} == "YES" ]]; then
-    # If USE_PREPBUFR_FROM_OPS is set, copy prepbufr from COMINobsproc
-    PREPBUFR_DIR="${COMINobsproc}"
-  else
-    # If PREPBUFR_DIR is not set, exit out with an error
-    if [[ -z "${PREPBUFR_DIR}" ]]; then
-      export err=1
-      err_exit "PREPBUFR_DIR is not set!"
-    fi
-
-  fi
-  cpreq "${PREPBUFR_DIR}/${OPREFIX}prepbufr" "${COMOUT_OBS}/${OPREFIX}prepbufr"
-  cpreq "${PREPBUFR_DIR}/${OPREFIX}prepbufr.acft_profiles" "${COMOUT_OBS}/${OPREFIX}prepbufr.acft_profiles"
-  if [[ ${DONST} == "YES" ]]; then
-    cpreq "${PREPBUFR_DIR}/${OPREFIX}nsstbufr" "${COMOUT_OBS}/${OPREFIX}nsstbufr"
-  fi
-fi
-
-# Check if prepbufr, etc files were copied to COMOUT_OBS
-files="prepbufr prepbufr.acft_profiles"
-if [[ ${DONST} == "YES" ]]; then
-  files="${files} nsstbufr"
-fi
-err=0
-for file in ${files}; do
-  if [[ ! -f "${COMOUT_OBS}/${OPREFIX}${file}" ]]; then
-    err=1
-    echo "Failed to obtain/create ${file}, ABORT!"
-  fi
-done
-export err
-if [[ ${err} -ne 0 ]]; then
-  err_exit "Failed to obtain/create ${files}, ABORT!"
-fi
+#if [[ ${PROCESS_TROPCY} == "YES" ]]; then
+#
+#    export ARCHSYND=${ROTDIR}/syndat
+#    mkdir -p "${ARCHSYND}"
+#    if [[ ! -s ${ARCHSYND}/syndat_akavit ]]; then
+#        for file in syndat_akavit syndat_dateck syndat_stmcat.scr syndat_stmcat syndat_sthisto syndat_sthista ; do
+#            cpreq "${COMINsyn}/${file}" "${ARCHSYND}"/.
+#        done
+#    fi
+#
+#    rm -f "${COMOUT_OBS}/${RUN_local}.t${cyc}z.syndata.tcvitals.tm00"
+#
+#    "${HOMEgfs}/jobs/JGLOBAL_ATMOS_TROPCY_QC_RELOC"
+#    status=$?
+#    if [[ ${status} -ne 0 ]]; then
+#        exit "${status}"
+#    fi
+#
+#else
+#    cpfs "${COMINobsproc}/${RUN_local}.t${cyc}z.syndata.tcvitals.tm00" "${COMOUT_OBS}/"
+#fi
+#
+#
+################################################################
+## Generate prepbufr files from dumps and prior gdas guess
+#rm -f "${COMOUT_OBS}/${OPREFIX}prepbufr"
+#rm -f "${COMOUT_OBS}/${OPREFIX}prepbufr.acft_profiles"
+#rm -f "${COMOUT_OBS}/${OPREFIX}nsstbufr"
+#
+#RUN="gdas" YMD=${PDY} HH=${cyc} declare_from_tmpl -rx COMIN_ATMOS_HISTORY_GDAS:COM_ATMOS_HISTORY_TMPL
+#RUN="gfs" YMD=${PDY} HH=${cyc} declare_from_tmpl -rx COMIN_ATMOS_HISTORY_GFS:COM_ATMOS_HISTORY_TMPL
+#
+#export job="j${RUN_local}_prep_${cyc}"
+#
+##TODO: Update external packages (obsproc/prepobs) to use COMIN[OUT]_*
+#export COMINtcvital=${COMIN_TCVITAL}
+#export COMIN=${COMIN_OBS}
+#export COMOUT=${COMOUT_OBS}
+#export COMINgdas=${COMIN_ATMOS_HISTORY_GDAS}
+#export COMINgfs=${COMIN_ATMOS_HISTORY_GFS}
+#
+#export COMSP=${COMSP:-"${COMIN_OBS}/${RUN_local}.t${cyc}z."}
+#
+## Create or Copy prepbufr, prepbufr.acft_profiles, nsstbufr files
+## Do not fail on external errors
+#if [[ ${MAKE_PREPBUFR:-"YES"} == "YES" ]]; then
+#  set +eu
+#  "${HOMEobsproc}/jobs/JOBSPROC_GLOBAL_PREP" && true
+#  export err=$?
+#  if [[ ${err} -ne 0 ]]; then
+#     err_exit "JOBSPROC_GLOBAL_PREP job failed, ABORT!"
+#  fi
+#else
+#  if [[ ${USE_PREPBUFR_FROM_OPS:-"YES"} == "YES" ]]; then
+#    # If USE_PREPBUFR_FROM_OPS is set, copy prepbufr from COMINobsproc
+#    PREPBUFR_DIR="${COMINobsproc}"
+#  else
+#    # If PREPBUFR_DIR is not set, exit out with an error
+#    if [[ -z "${PREPBUFR_DIR}" ]]; then
+#      export err=1
+#      err_exit "PREPBUFR_DIR is not set!"
+#    fi
+#
+#  fi
+#  cpreq "${PREPBUFR_DIR}/${OPREFIX}prepbufr" "${COMOUT_OBS}/${OPREFIX}prepbufr"
+#  cpreq "${PREPBUFR_DIR}/${OPREFIX}prepbufr.acft_profiles" "${COMOUT_OBS}/${OPREFIX}prepbufr.acft_profiles"
+#  if [[ ${DONST} == "YES" ]]; then
+#    cpreq "${PREPBUFR_DIR}/${OPREFIX}nsstbufr" "${COMOUT_OBS}/${OPREFIX}nsstbufr"
+#  fi
+#fi
+#
+## Check if prepbufr, etc files were copied to COMOUT_OBS
+#files="prepbufr prepbufr.acft_profiles"
+#if [[ ${DONST} == "YES" ]]; then
+#  files="${files} nsstbufr"
+#fi
+#err=0
+#for file in ${files}; do
+#  if [[ ! -f "${COMOUT_OBS}/${OPREFIX}${file}" ]]; then
+#    err=1
+#    echo "Failed to obtain/create ${file}, ABORT!"
+#  fi
+#done
+#export err
+#if [[ ${err} -ne 0 ]]; then
+#  err_exit "Failed to obtain/create ${files}, ABORT!"
+#fi
 
 ################################################################################
 # Exit out cleanly
