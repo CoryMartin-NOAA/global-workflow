@@ -28,25 +28,24 @@ def calcanl_gcafs(RunDir, ComOut, APrefix):
 
     # add meteorological increments to background meteorological fields
     metvars = [['spfh', 'sphum'],
-                ['tmp', 'T'],
-                ['ugrd', 'u'],
-                ['vgrd', 'v'],
-                ['dpres', 'delp'],
-                ['delz', 'delz'],
-                ['o3mr', 'o3mr'],
-                ['clwmr', 'liq_wat'],
-                ['icmr', 'icmr'],]
+               ['tmp', 'T'],
+               ['ugrd', 'u'],
+               ['vgrd', 'v'],
+               ['dpres', 'delp'],
+               ['delz', 'delz'],
+               ['o3mr', 'o3mr'],
+               ['clwmr', 'liq_wat']]
 
     with Dataset(inc_file, mode='r') as incfile, Dataset(ges_file, mode='r') as gesfile, Dataset(anl_file, mode='a') as anlfile:
         # loop over meteorological variables and add increments to background
         for ioname, incname in metvars:
             print(f"Adding increment to background for variable: {ioname}")
             bkg = gesfile.variables[ioname][:]
-            increment = incfile.variables[incname+'_inc'][:]
-            anl = bkg + increment
+            increment = incfile.variables[incname + '_inc'][:]
+            anl = bkg + np.flip(increment, axis=1)
 
             anlfile.variables[ioname][:] = anl[:]
-        
+
         # handle pressfc as a special case
         print("Adding increment to background for variable: pressfc")
         # read bk attribute and compute ps_inc from delp_inc
@@ -59,14 +58,13 @@ def calcanl_gcafs(RunDir, ComOut, APrefix):
 
         pressfc = gesfile.variables['pressfc'][:]
         delp_inc = incfile.variables['delp_inc'][:]
-        
+
         # compute surface pressure increment
         ps_inc = delp_inc[-1] / (bk[-1] - bk[-2])
-        
+
         # add increment to background surface pressure
-        pressfc_anl = pressfc + ps_inc
+        pressfc_anl = pressfc + np.flip(ps_inc, axis=0)
         anlfile.variables['pressfc'][:] = pressfc_anl[:]
-        
 
     # add aerosol increments to background aerosol fields
     aerovars = [['so4', 'mass_fraction_of_sulfate_in_air'],
@@ -110,10 +108,6 @@ def calcanl_gcafs(RunDir, ComOut, APrefix):
         time_units_new = f"hours since {cycle_time[0]}"
         anlfile.variables['time'][:] = 0.0
         anlfile.variables['time'].setncattr("units", time_units_new)
-
-    # copy analysis file to output location
-    out_anl_file = os.path.join(ComOut, APrefix + 'atmanl.nc')
-    FileHandler({'copy': [[anl_file, out_anl_file]]}).sync()
 
     print('calcanl_gcafs successfully completed at: ', datetime.datetime.utcnow())
 

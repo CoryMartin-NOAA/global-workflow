@@ -81,7 +81,13 @@ ATMANL=${ATMANL:-"${COMOUT_ATMOS_ANALYSIS}/${APREFIX}analysis.atm.a006.nc"}
 # Increment files
 ATMINC=${ATMINC:-"${COMOUT_ATMOS_ANALYSIS}/${APREFIX}increment.atm.i006.nc"}
 DTFANL=${DTFANL:-"${COMOUT_ATMOS_ANALYSIS}/${APREFIX}increment.dtf.i006.nc"}
+<<<<<<< HEAD
 AEROINC=${AEROINC:-"${COMIN_CHEM_ANALYSIS}/${APREFIX}aeroinc.nc"}
+=======
+if [[ "${RUN}" == "gcdas" ]]; then
+    AEROINC=${AEROINC:-"${COMIN_CHEM_ANALYSIS}/${APREFIX}aeroinc.nc"}
+fi
+>>>>>>> develop
 
 # Set script / GSI control parameters
 DOHYBVAR=${DOHYBVAR:-"NO"}
@@ -186,7 +192,6 @@ if [[ "${DOGAUSFCANL}" == "YES" ]]; then
     fi
 fi
 
-# shellcheck disable=SC2312
 echo "${rCDUMP} ${PDY}${cyc} atmanl and sfcanl done at $(date)" > "${COMOUT_ATMOS_ANALYSIS}/${APREFIX}analysis.done.txt"
 
 ################################################################################
