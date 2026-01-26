@@ -176,8 +176,8 @@ if [[ -d "${HOMEgfs}/sorc/gcdas.cd" ]]; then
         if [[ -d "${gcdas_sub}" ]]; then
             rm -rf "${gcdas_sub}"
         fi
-        fix_ver="gcdas_${gcdas_sub}_ver"
-        ${LINK_OR_COPY} "${FIX_DIR}/gcdas/${gcdas_sub}/${!fix_ver}" "${gcdas_sub}"
+        fix_ver="gdas_${gcdas_sub}_ver"
+        ${LINK_OR_COPY} "${FIX_DIR}/gdas/${gcdas_sub}/${!fix_ver}" "${gcdas_sub}"
     done
 fi
 
