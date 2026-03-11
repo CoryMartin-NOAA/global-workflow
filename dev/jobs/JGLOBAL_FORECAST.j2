@@ -9,13 +9,6 @@ export DATA="${DATAjob}/${jobid}"
 source "${HOMEglobal}/ush/jjob_header.sh" -e "fcst" -c "base fcst"
 #{% endif %}
 
-export HOMEglobal="${HOMEgcafs}"
-export EXECglobal="${HOMEglobal}/exec"
-export FIXglobal="${HOMEglobal}/fix"
-export PARMglobal="${HOMEglobal}/parm"
-export SCRglobal="${HOMEglobal}/scripts"
-export USHglobal="${HOMEglobal}/ush"
-
 # Setup Python path for pygfs
 PYTHONPATH="${HOMEglobal}/ush/python${PYTHONPATH:+:${PYTHONPATH}}"
 export PYTHONPATH
