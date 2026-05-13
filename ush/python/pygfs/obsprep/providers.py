@@ -59,7 +59,7 @@ class ProviderConfig:
         qc_raw = task_config.providers[provider_name]["qc config"]
         qc = QCConfig.from_dict(qc_raw)
 
-        print(f"@@@@@@@@@@@@@@@@@@@@@@@@ provider: {provider_name}")
+        logger.info(f"provider: {provider_name}")
 
         if provider_name == "ghrsst":
             db = GhrSstDatabase(db_name=f"{provider_name}.db", dcom_dir=task_config.DCOMROOT, obs_dir="sst")

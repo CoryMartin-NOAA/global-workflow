@@ -1,7 +1,10 @@
 import os
 import glob
+from logging import getLogger
 from datetime import datetime
 from pyobsforge.obsdb import BaseDatabase
+
+logger = getLogger(__name__.split('.')[-1])
 
 
 class NesdisMirsDatabase(BaseDatabase):
@@ -53,7 +56,7 @@ class NesdisMirsDatabase(BaseDatabase):
             parts = fname.split("_")
 
             if len(parts) < 6 or not parts[3].startswith("s") or not parts[5].startswith("c"):
-                print(f"[DEBUG] Unexpected filename format: {fname}")
+                logger.debug(f"Unexpected filename format: {fname}")
                 return None
 
             instrument = parts[0].split("-")[1]
@@ -67,7 +70,7 @@ class NesdisMirsDatabase(BaseDatabase):
             }.get(satellite.lower(), None)
 
             if obs_type is None:
-                print(f"[DEBUG] Unrecognized satellite: {satellite}")
+                logger.debug(f"Unrecognized satellite: {satellite}")
                 return None
 
             obs_time = datetime.strptime(parts[3][1:15], "%Y%m%d%H%M%S")
@@ -75,7 +78,7 @@ class NesdisMirsDatabase(BaseDatabase):
             return filename, obs_time, receipt_time, instrument, satellite, obs_type
 
         except Exception as e:
-            print(f"[ERROR] Failed to parse {filename}: {e}")
+            logger.error(f"Failed to parse {filename}: {e}")
             return None
 
     def ingest_files(self):
@@ -85,7 +88,7 @@ class NesdisMirsDatabase(BaseDatabase):
             matched = glob.glob(os.path.join(base, "*.nc"))
             obs_files.extend(matched)
 
-        print(f"[INFO] Found {len(obs_files)} new files to ingest")
+        logger.info(f"Found {len(obs_files)} new files to ingest")
 
         records_to_insert = []
         for file in obs_files:
@@ -93,7 +96,7 @@ class NesdisMirsDatabase(BaseDatabase):
             if parsed_data:
                 records_to_insert.append(parsed_data)
             else:
-                print(f"[WARN] Skipped (unparseable): {os.path.basename(file)}")
+                logger.warning(f"Skipped (unparseable): {os.path.basename(file)}")
 
         if records_to_insert:
             query = """
@@ -102,6 +105,6 @@ class NesdisMirsDatabase(BaseDatabase):
             """
             try:
                 self.insert_records(query, records_to_insert)
-                print(f"[INFO] Successfully ingested {len(records_to_insert)} files into the database.")
+                logger.info(f"Successfully ingested {len(records_to_insert)} files into the database")
             except Exception as e:
-                print(f"[ERROR] Failed to insert records: {e}")
+                logger.error(f"Failed to insert records: {e}")

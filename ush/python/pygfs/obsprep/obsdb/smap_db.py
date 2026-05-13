@@ -1,7 +1,10 @@
 import os
 import glob
+from logging import getLogger
 from datetime import datetime
 from pygfs.obsprep.obsdb import BaseDatabase
+
+logger = getLogger(__name__.split('.')[-1])
 
 
 class SmapDatabase(BaseDatabase):
@@ -47,7 +50,7 @@ class SmapDatabase(BaseDatabase):
 
         # Pre-check: Must match SMAP_L2B_SSS_NRT structure
         if not basename.startswith("SMAP_L2B_SSS_NRT") or len(parts) < 7:
-            print(f"[DEBUG] Skipping non-SMAP_L2B_SSS_NRT file: {filename}")
+            logger.debug(f"Skipping non-SMAP_L2B_SSS_NRT file: {filename}")
             return None
 
         try:
@@ -60,13 +63,13 @@ class SmapDatabase(BaseDatabase):
             return filename, obs_time, receipt_time, satellite, obs_type
 
         except Exception as e:
-            print(f"[DEBUG] Error parsing filename {filename}: {e}")
+            logger.debug(f"Error parsing filename {filename}: {e}")
             return None
 
     def ingest_files(self):
         """Scan the directory for new observation files and insert them into the database."""
         obs_files = glob.glob(os.path.join(self.base_dir, "*.h5"))
-        print(f"Found {len(obs_files)} new files to ingest")
+        logger.info(f"Found {len(obs_files)} new files to ingest")
 
         records_to_insert = []
         for file in obs_files:
@@ -74,7 +77,7 @@ class SmapDatabase(BaseDatabase):
             if parsed_data:
                 records_to_insert.append(parsed_data)
             else:
-                print(f"[DEBUG] Skipped (unparseable): {os.path.basename(file)}")
+                logger.debug(f"Skipped (unparseable): {os.path.basename(file)}")
 
         if records_to_insert:
             query = """
@@ -83,6 +86,6 @@ class SmapDatabase(BaseDatabase):
             """
             try:
                 self.insert_records(query, records_to_insert)
-                print(f"################################ Successfully ingested {len(records_to_insert)} files into the database.")
+                logger.info(f"Successfully ingested {len(records_to_insert)} files into the database")
             except Exception as e:
-                print(f"[ERROR] Failed to insert records: {e}")
+                logger.error(f"Failed to insert records: {e}")

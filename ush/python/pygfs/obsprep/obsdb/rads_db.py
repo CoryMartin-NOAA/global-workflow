@@ -1,7 +1,10 @@
 import os
 import glob
+from logging import getLogger
 from datetime import datetime, timedelta
 from pygfs.obsprep.obsdb import BaseDatabase
+
+logger = getLogger(__name__.split('.')[-1])
 
 
 class RADSDatabase(BaseDatabase):
@@ -52,7 +55,7 @@ class RADSDatabase(BaseDatabase):
     def ingest_files(self):
         """Scan the directory for new RADS observation files and insert them into the database."""
         obs_files = glob.glob(os.path.join(self.base_dir, "*.nc"))
-        print(f"Found {len(obs_files)} new files to ingest")
+        logger.info(f"Found {len(obs_files)} new files to ingest")
 
         records_to_insert = []
         for file in obs_files:
@@ -67,6 +70,6 @@ class RADSDatabase(BaseDatabase):
             """
             try:
                 self.insert_records(query, records_to_insert)
-                print(f"################################ Successfully ingested {len(records_to_insert)} files into the database.")
+                logger.info(f"Successfully ingested {len(records_to_insert)} files into the database")
             except Exception as e:
-                print(f"Failed to insert records: {e}")
+                logger.error(f"Failed to insert records: {e}")

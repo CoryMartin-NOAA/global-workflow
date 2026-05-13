@@ -1,7 +1,10 @@
 import os
 import glob
+from logging import getLogger
 from datetime import datetime
 from pygfs.obsprep.obsdb import BaseDatabase
+
+logger = getLogger(__name__.split('.')[-1])
 
 
 class NesdisAmsr2Database(BaseDatabase):
@@ -51,7 +54,7 @@ class NesdisAmsr2Database(BaseDatabase):
 
         # Pre-check: Must be an AMSR2-SEAICE file
         if not parts[0].startswith("AMSR2-SEAICE"):
-            print(f"[DEBUG] Skipping non AMSR2-SEAICE file: {filename}")
+            logger.debug(f"Skipping non AMSR2-SEAICE file: {filename}")
             return None
 
         try:
@@ -66,7 +69,7 @@ class NesdisAmsr2Database(BaseDatabase):
             elif hemisphere == "sh":
                 obs_type = "icec_amsr2_south"
             else:
-                print(f"[DEBUG] Unrecognized hemisphere in filename: {filename}")
+                logger.debug(f"Unrecognized hemisphere in filename: {filename}")
                 return None
 
             satellite = parts[2]
@@ -75,13 +78,13 @@ class NesdisAmsr2Database(BaseDatabase):
             return filename, obs_time, receipt_time, instrument, satellite, obs_type
 
         except Exception as e:
-            print(f"[DEBUG] Error parsing filename {filename}: {e}")
+            logger.debug(f"Error parsing filename {filename}: {e}")
             return None
 
     def ingest_files(self):
         """Scan the directory for new NESDIS AMSR2 observation files and insert them into the database."""
         obs_files = glob.glob(os.path.join(self.base_dir, "*.nc"))
-        print(f"Found {len(obs_files)} new files to ingest")
+        logger.info(f"Found {len(obs_files)} new files to ingest")
 
         records_to_insert = []
         for file in obs_files:
@@ -96,6 +99,6 @@ class NesdisAmsr2Database(BaseDatabase):
             """
             try:
                 self.insert_records(query, records_to_insert)
-                print(f"################################ Successfully ingested {len(records_to_insert)} files into the database.")
+                logger.info(f"Successfully ingested {len(records_to_insert)} files into the database")
             except Exception as e:
-                print(f"Failed to insert records: {e}")
+                logger.error(f"Failed to insert records: {e}")
