@@ -1,8 +1,7 @@
 import os
-import subprocess
 import logging
 from functools import wraps
-from wxflow import parse_j2yaml
+from wxflow import parse_j2yaml, Executable
 
 logger = logging.getLogger(__name__.split('.')[-1])
 
@@ -48,23 +47,14 @@ class BufrFile:
     @logit(logger)
     def split(self):
         """Split BUFR file by subset using external binary `split_by_subset`"""
-        try:
-            cmd = f"""
-            split_by_subset {self.bufr_file}
-            """
-            result = subprocess.run(cmd, shell=True, check=True,
-                                    executable="/bin/bash", capture_output=True, text=True)
-            logger.debug("✔️ split_by_subset ran successfully.")
-            logger.debug(result.stdout)
-        except subprocess.CalledProcessError as e:
-            logger.error("No split files found after running split_by_subset")
-            logger.error("❌ split_by_subset failed.")
-            logger.error("STDOUT:", e.stdout)
-            logger.error("STDERR:", e.stderr)
+        exec_cmd = Executable("split_by_subset")
+        exec_cmd.add_default_arg(self.bufr_file)
 
-        except subprocess.CalledProcessError as e:
-            logger.error(f"split_by_subset failed: {e.stderr}")
-            raise RuntimeError(f"split_by_subset failed: {e.stderr}") from e
+        logger.info(f"Executing {exec_cmd}")
+        try:
+            exec_cmd()
+        except Exception as e:
+            raise RuntimeError(f"split_by_subset failed: {e}") from e
 
         self.split_files = [
             os.path.join(self.work_dir, f) for f in os.listdir(self.work_dir)

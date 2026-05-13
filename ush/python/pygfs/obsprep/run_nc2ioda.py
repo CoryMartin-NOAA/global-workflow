@@ -1,6 +1,5 @@
 from logging import getLogger
-import subprocess
-from wxflow import save_as_yaml, parse_j2yaml
+from wxflow import save_as_yaml, parse_j2yaml, Executable
 from os.path import join
 
 logger = getLogger(__name__.split('.')[-1])
@@ -25,17 +24,13 @@ def run_nc2ioda(task_config: dict, obs_space: str, context: dict) -> int:
 
     # Run the ioda converter
     nc2ioda_exe = join(task_config['HOMEobsforge'], 'build', 'bin', 'obsforge_obsprovider2ioda.x')
+    exec_cmd = Executable(nc2ioda_exe)
+    exec_cmd.add_default_arg(nc2ioda_yaml)
+
+    logger.info(f"Executing {exec_cmd}")
     try:
-        result = subprocess.run([nc2ioda_exe, nc2ioda_yaml],
-                                cwd=task_config['DATA'],
-                                capture_output=True,
-                                text=True)
-        logger.info(f"Standard Output: \n{result.stdout}")
-        # TODO (G): Figure out what to do with failures.
-        #           Ignore failures for now and just issue a warning
-        if result.returncode != 0:
-            logger.error(f"Standard Error: \n{result.stderr}")
+        exec_cmd()
         return 0
-    except subprocess.CalledProcessError as e:
-        logger.warning(f"ioda converter failed with error {e}, \
-            return code {e.returncode}")
+    except Exception as e:
+        logger.warning(f"ioda converter failed with error {e}")
+        return 0
