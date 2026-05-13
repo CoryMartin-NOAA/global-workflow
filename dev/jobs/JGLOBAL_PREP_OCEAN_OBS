@@ -28,8 +28,11 @@ declare -rx COMOUT_OBS="${ROTDIR}/${RUN}.${PDY}/${cyc}/obs"
 
 ###############################################################
 # Run relevant script
-
-EXSCRIPT=${GDASPREPOCNOBSPY:-${SCRglobal}/exglobal_prep_ocean_obs.py}
+if [[ "${RUN_ENVIR:-emc}" == "nco" ]]; then
+    EXSCRIPT=${GDASPREPOCNOBSPY:-${SCRglobal}/exglobal_prep_ocean_obs.py}
+else
+    EXSCRIPT=${GDASPREPOCNOBSPY:-${SCRglobal}/exglobal_prep_ocean_obs_dev.py}
+fi
 ${EXSCRIPT} && true
 export err=$?
 if [[ ${err} -ne 0 ]]; then
