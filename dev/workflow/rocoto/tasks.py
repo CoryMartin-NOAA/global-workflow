@@ -17,7 +17,7 @@ class Tasks:
                    'prep_sfc', 'prep', 'anal', 'sfcanl_regrid', 'sfcanl_gcycle', 'analcalc', 'analdiag', 'arch_vrfy', 'arch_tars',
                    'ecen_fv3jedi', 'analcalc_fv3jedi', 'cleanup',
                    'atmanlinit', 'atmanlvar', 'atmanlfv3inc', 'atmanlfinal',
-                   'prep_emissions', 'prepoceanobs',
+                   'prep_emissions', 'marineobsdump', 'marineobsbufrdump', 'prepoceanobs',
                    'marineanlinit', 'marineanlletkf', 'marinebmatinit', 'marinebmat', 'marineanlvar',
                    'marineanlecen', 'marineanlchkpt', 'marineanlfinal', 'ocnanalvrfy',
                    'eobs', 'epos', 'esfc_gcycle', 'esfc_regrid', 'eupd',

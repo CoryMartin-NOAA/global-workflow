@@ -70,6 +70,9 @@ class GFSCycledAppConfig(AppConfig):
 
         for run in self.runs:
             base = conf.parse_config('config.base', RUN=run)
+            run_envir = str(base.get('RUN_ENVIR', 'emc')).lower()
+            machine = str(base.get('machine', '')).upper()
+            use_marine_dump_jobs_cfg = str(base.get('USE_MARINE_DUMP_JOBS_RT_WCOSS2', True)).upper() in ['YES', 'TRUE', '1']
 
             run_options[run]['do_hybvar'] = base.get('DOHYBVAR', False)
             run_options[run]['do_hybvar_ocn'] = base.get('DOHYBVAR_OCN', False)
@@ -87,6 +90,7 @@ class GFSCycledAppConfig(AppConfig):
             run_options[run]['do_gsiliau'] = base.get('DO_LAND_IAU', run_options[run]['do_gsisoilda'])
             run_options[run]['do_mergensst'] = base.get('DO_MERGENSST', False)
             run_options[run]['do_wdqms'] = base.get('DO_WDQMS', False)
+            run_options[run]['use_marine_dump_jobs_rt_wcoss2'] = use_marine_dump_jobs_cfg and run_envir == 'nco' and machine == 'WCOSS2'
 
         return run_options
 
@@ -123,7 +127,11 @@ class GFSCycledAppConfig(AppConfig):
             configs += ['wdqms']
 
         if options['do_jediocnvar']:
-            configs += ['prepoceanobs', 'marinebmatinit', 'marinebmat', 'marineanlinit', 'marineanlvar']
+            if options['use_marine_dump_jobs_rt_wcoss2']:
+                configs += ['marineobsdump', 'marineobsbufrdump']
+            else:
+                configs += ['prepoceanobs']
+            configs += ['marinebmatinit', 'marinebmat', 'marineanlinit', 'marineanlvar']
             if options['do_letkf_ocn']:
                 configs += ['marineanlletkf']
             if options['do_hybvar']:
@@ -269,7 +277,11 @@ class GFSCycledAppConfig(AppConfig):
                     task_names[run] += ['anal', 'analcalc']
 
                 if options['do_jediocnvar']:
-                    task_names[run] += ['prepoceanobs', 'marinebmatinit', 'marinebmat', 'marineanlinit', 'marineanlvar', 'marineanlchkpt', 'marineanlfinal']
+                    if options['use_marine_dump_jobs_rt_wcoss2']:
+                        task_names[run] += ['marineobsdump', 'marineobsbufrdump']
+                    else:
+                        task_names[run] += ['prepoceanobs']
+                    task_names[run] += ['marinebmatinit', 'marinebmat', 'marineanlinit', 'marineanlvar', 'marineanlchkpt', 'marineanlfinal']
 
                 task_names[run] += ['sfcanl_gcycle']
 
