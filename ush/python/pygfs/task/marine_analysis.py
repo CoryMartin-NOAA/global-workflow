@@ -5,10 +5,11 @@ from logging import getLogger
 import os
 import pygfs.utils.marine_da_utils as mdau
 from pygfs.jedi import Jedi
+from pygfs.jedi.jedi import find_value_in_nested_dict
 from pygfs.task.analysis import Analysis
 from wxflow import (AttrDict, FileHandler,
                     to_timedelta, to_fv3time,
-                    parse_j2yaml,
+                    parse_j2yaml, save_as_yaml,
                     logit)
 
 logger = getLogger(__name__.split('.')[-1])
@@ -123,7 +124,19 @@ class MarineAnalysis(Analysis):
 
         # initialize JEDI applications
         logger.info(f"Initializing JEDI applications")
-        self.jedi_dict['var'].initialize(self.task_config, clean_empty_obsspaces=True)
+
+        # Render var JEDI config, filter obs spaces, then save YAML
+        self.jedi_dict['var'].jedi_config.input_config = self.jedi_dict['var'].render_jcb(self.task_config)
+
+        # Remove ADT obs spaces for non-00Z cycles before writing YAML (ADT obs only available at 00Z)
+        if self.task_config.current_cycle.hour != 0:
+            logger.info("Non-00Z cycle: removing ADT obs spaces from variational JEDI config")
+            self._remove_adt_obsspace()
+
+        self.jedi_dict['var'].clean_empty_obsspaces()
+        save_as_yaml(self.jedi_dict['var'].jedi_config.input_config,
+                     self.jedi_dict['var'].jedi_config.yaml)
+
         self.jedi_dict['soca_incpostproc'].initialize(self.task_config)
 
         # This method is a bit of a hack that will be removed in the future when the anlstat
@@ -178,6 +191,38 @@ class MarineAnalysis(Analysis):
         except Exception as e:
             logger.warning(f"Failed to render JCB template, 'soca_diags_finalize': {e}")
         FileHandler(diags_list).sync()
+
+    @logit(logger)
+    def _remove_adt_obsspace(self) -> None:
+        """Remove ADT obs spaces from the variational JEDI config for non-00Z cycles
+
+        ADT (Absolute Dynamic Topography) observations are only available at 00Z.
+        This method removes ADT obs spaces from the JEDI variational application
+        config and re-saves the YAML.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        ----------
+        None
+        """
+
+        observers = find_value_in_nested_dict(
+            self.jedi_dict['var'].jedi_config.input_config, 'observers'
+        )
+
+        if observers:
+            cleaned_observers = [obs for obs in observers
+                                 if 'adt' not in obs['obs space']['name'].lower()]
+            n_removed = len(observers) - len(cleaned_observers)
+            if n_removed > 0:
+                logger.info(f"Removed {n_removed} ADT obs space(s) for non-00Z cycle")
+                observers.clear()
+                observers.extend(cleaned_observers)
+            else:
+                logger.info("No ADT obs spaces found in variational JEDI config")
 
     @logit(logger)
     def initialize_obs_stats(self) -> None:
