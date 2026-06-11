@@ -737,7 +737,7 @@ class GFSTasks(Tasks):
         deps = []
         dep_dict = {'type': 'task', 'name': f"{self.run.replace('enkf', '')}_prepoceanobs"}
         deps.append(rocoto.add_dependency(dep_dict))
-        dep_dict = {'type': 'task', 'name': f"{self.run.replace('enkf', '')}_marinebmat"}
+        dep_dict = {'type': 'task', 'name': f"{self.run.replace('enkf', '')}_marinebmat", 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
         deps.append(rocoto.add_dependency(dep_dict))
         dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
 
@@ -764,12 +764,13 @@ class GFSTasks(Tasks):
 
         deps = []
         data = f'{ocean_hist_path}/gdas.t@Hz.inst.f009.nc'
-        dep_dict = {'type': 'data', 'data': data, 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
+        dep_dict = {'type': 'data', 'data': data}
         deps.append(rocoto.add_dependency(dep_dict))
         if self.options['do_hybvar_ocn']:
-            dep_dict = {'type': 'metatask', 'name': 'enkfgdas_fcst', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
+            dep_dict = {'type': 'metatask', 'name': 'enkfgdas_fcst'}
             deps.append(rocoto.add_dependency(dep_dict))
         dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
+        cycledef = 'gdas_half,gdas' if self.run in ['gdas'] else self.run
 
         resources = self.get_resource('marinebmatinit')
         task_name = f'{self.run}_marinebmatinit'
@@ -777,7 +778,7 @@ class GFSTasks(Tasks):
                      'resources': resources,
                      'dependency': dependencies,
                      'envars': self.envars,
-                     'cycledef': self.run.replace('enkf', ''),
+                     'cycledef': cycledef,
                      'command': f'{self.HOMEglobal}/dev/job_cards/rocoto/marinebmatinit.sh',
                      'job_name': f'{self.pslot}_{task_name}_@H',
                      'log': f'{self.rotdir}/logs/@Y@m@d@H/{task_name}.log',
@@ -794,6 +795,7 @@ class GFSTasks(Tasks):
         dep_dict = {'type': 'task', 'name': f'{self.run}_marinebmatinit'}
         deps.append(rocoto.add_dependency(dep_dict))
         dependencies = rocoto.create_dependency(dep=deps)
+        cycledef = 'gdas_half,gdas' if self.run in ['gdas'] else self.run
 
         resources = self.get_resource('marinebmat')
         task_name = f'{self.run}_marinebmat'
@@ -801,7 +803,7 @@ class GFSTasks(Tasks):
                      'resources': resources,
                      'dependency': dependencies,
                      'envars': self.envars,
-                     'cycledef': self.run.replace('enkf', ''),
+                     'cycledef': cycledef,
                      'command': f'{self.HOMEglobal}/dev/job_cards/rocoto/marinebmat.sh',
                      'job_name': f'{self.pslot}_{task_name}_@H',
                      'log': f'{self.rotdir}/logs/@Y@m@d@H/{task_name}.log',
@@ -817,7 +819,7 @@ class GFSTasks(Tasks):
         deps = []
         dep_dict = {'type': 'task', 'name': f'{self.run}_prepoceanobs'}
         deps.append(rocoto.add_dependency(dep_dict))
-        dep_dict = {'type': 'task', 'name': f'{self.run}_marinebmat'}
+        dep_dict = {'type': 'metatask', 'name': f'{self.run}_marinebmat', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
         deps.append(rocoto.add_dependency(dep_dict))
         dep_dict = {'type': 'metatask', 'name': 'gdas_fcst', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
         deps.append(rocoto.add_dependency(dep_dict))
@@ -868,7 +870,7 @@ class GFSTasks(Tasks):
 
         # can run in parallel with marinebmat
         deps = []
-        dep_dict = {'type': 'task', 'name': f"{self.run.replace('enkf', '')}_marinebmatinit"}
+        dep_dict = {'type': 'task', 'name': f"{self.run.replace('enkf', '')}_prepoceanobs"}
         deps.append(rocoto.add_dependency(dep_dict))
         dependencies = rocoto.create_dependency(dep=deps)
 
