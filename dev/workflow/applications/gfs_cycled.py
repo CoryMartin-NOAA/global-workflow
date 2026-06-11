@@ -298,7 +298,7 @@ class GFSCycledAppConfig(AppConfig):
 
                     if options['do_gsisoilda']:
                         task_names[run] += ['sfcanl_regrid']
-                    if options['do_jediocnvar'
+                    if options['do_jediocnvar']:
                         task_names[run] += ['marinebmatinit', 'marinebmat']
                 else:
                     if options['do_wave']:
