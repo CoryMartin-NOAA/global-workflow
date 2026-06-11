@@ -4,8 +4,17 @@ export EXPDIR="${EXPDIR:-${HOMEglobal}/parm/config/${NET}}"
 export DATAjob="${DATAROOT}/marineanalysis.${PDY:-}${cyc}"
 export DATAens="${DATAjob}/ensdata"
 export DATA="${DATAjob}/marineanlvar"
-source "${HOMEglobal}/ush/jjob_header.sh" -e "marineanlinit" -c "base marineanl marineanlinit"
 
+# Create the directory to hold the BMAT initialization data
+export DATA="${DATAjob}/marinebmat"
+# Create the directory to hold ensemble perturbations
+export DATAens="${DATAjob}/ensdata"
+export DATAstaticb="${DATAjob}/staticb"
+if [[ ! -d "${DATAens}" ]]; then mkdir -p "${DATAens}"; fi
+if [[ ! -d "${DATAstaticb}" ]]; then mkdir -p "${DATAstaticb}"; fi
+
+
+source "${HOMEglobal}/ush/jjob_header.sh" -e "marineanlinit" -c "base marineanl marineanlinit"
 #{% if false %}
 source "${HOMEglobal}/ush/jjob_standard_vars.sh"
 #{% else %}
@@ -42,8 +51,8 @@ declare -rx COMIN_OCEAN_HISTORY_PREV="${ROTDIR}/${GDUMP}.${gPDY}/${gcyc}/model/o
 declare -rx COMIN_ICE_HISTORY_PREV="${ROTDIR}/${GDUMP}.${gPDY}/${gcyc}/model/ice/history"
 declare -rx COMIN_ICE_RESTART_PREV="${ROTDIR}/${GDUMP}.${gPDY}/${gcyc}/model/ice/restart"
 
-declare -rx COMIN_OCEAN_BMATRIX="${ROTDIR}/${RUN}.${PDY}/${cyc}/analysis/ocean/bmatrix"
-declare -rx COMIN_ICE_BMATRIX="${ROTDIR}/${RUN}.${PDY}/${cyc}/analysis/ice/bmatrix"
+declare -rx COMIN_OCEAN_BMATRIX_PREV="${ROTDIR}/${GDUMP}.${gPDY}/${gcyc}/analysis/ocean/bmatrix"
+declare -rx COMIN_ICE_BMATRIX_PREV="${ROTDIR}/${GDUMP}.${gPDY}/${gcyc}/analysis/ice/bmatrix"
 
 ###############################################################
 # Run relevant script
