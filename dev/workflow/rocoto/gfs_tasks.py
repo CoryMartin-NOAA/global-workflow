@@ -819,7 +819,7 @@ class GFSTasks(Tasks):
         deps = []
         dep_dict = {'type': 'task', 'name': f'{self.run}_prepoceanobs'}
         deps.append(rocoto.add_dependency(dep_dict))
-        dep_dict = {'type': 'metatask', 'name': f'{self.run}_marinebmat', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
+        dep_dict = {'type': 'task', 'name': 'gdas_marinebmat', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
         deps.append(rocoto.add_dependency(dep_dict))
         dep_dict = {'type': 'metatask', 'name': 'gdas_fcst', 'offset': f"-{timedelta_to_HMS(self._base['interval_gdas'])}"}
         deps.append(rocoto.add_dependency(dep_dict))
