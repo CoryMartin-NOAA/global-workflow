@@ -272,7 +272,7 @@ class GFSCycledAppConfig(AppConfig):
                     task_names[run] += ['anal', 'analcalc']
 
                 if options['do_jediocnvar']:
-                    task_names[run] += ['prepoceanobs', 'marinebmatinit', 'marinebmat', 'marineanlinit', 'marineanlvar', 'marineanlchkpt', 'marineanlfinal']
+                    task_names[run] += ['prepoceanobs', 'marineanlinit', 'marineanlvar', 'marineanlchkpt', 'marineanlfinal']
 
                 task_names[run] += ['sfcanl_gcycle']
 
